@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Financial Tracker</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+
+<header class="header">
+
+<div class="brand">
+<div class="logo">💰</div>
+
+<div>
+<h1>Financial Tracker</h1>
+<p>Take control of your money</p>
+</div>
+</div>
+
+<nav>
+<button class="nav-button active" data-page="dashboard">
+Dashboard
+</button>
+
+<button class="nav-button" data-page="transactions">
+Transactions
+</button>
+
+<button class="nav-button" data-page="goals">
+Savings Goals
+</button>
+</nav>
+
+</header>
+
+
+<!-- ================= MAIN ================= -->
+
+<main>
+
+
+<!-- ================= DASHBOARD ================= -->
+
+<section id="dashboard" class="page active">
+
+<div class="page-heading">
+
+<div>
+<p class="eyebrow">YOUR MONEY</p>
+
+<h2>
+Financial Dashboard
+</h2>
+
+<p>
+Track your income, expenses and savings.
+</p>
+</div>
+
+<button
+class="primary-button"
+id="dashboardAddButton">
+
++ Add Transaction
+
+</button>
+
+</div>
+
+
+<!-- ================= SUMMARY CARDS ================= -->
+
+<div class="summary-grid">
+
+<div class="summary-card balance-card">
+
+<div class="card-icon">
+💳
+</div>
+
+<p>Total Balance</p>
+
+<h3 id="totalBalance">
+$0.00
+</h3>
+
+<span>
+Current balance
+</span>
+
+</div>
+
+
+<div class="summary-card income-card">
+
+<div class="card-icon">
+📈
+</div>
+
+<p>Total Income</p>
+
+<h3 id="totalIncome">
+$0.00
+</h3>
+
+<span>
+Money received
+</span>
+
+</div>
+
+
+<div class="summary-card expense-card">
+
+<div class="card-icon">
+📉
+</div>
+
+<p>Total Expenses</p>
+
+<h3 id="totalExpenses">
+$0.00
+</h3>
+
+<span>
+Money spent
+</span>
+
+</div>
+
+
+<div class="summary-card savings-card">
+
+<div class="card-icon">
+🏦
+</div>
+
+<p>Saved</p>
+
+<h3 id="totalSaved">
+$0.00
+</h3>
+
+<span>
+Your savings
+</span>
+
+</div>
+
+</div>
+
+
+<!-- ================= DASHBOARD GRID ================= -->
+
+<div class="dashboard-grid">
+
+
+<!-- Spending -->
+
+<div class="panel chart-panel">
+
+<div class="panel-heading">
+
+<div>
+<h3>Spending Overview</h3>
+
+<p>
+Your expenses by category
+</p>
+</div>
+
+</div>
+
+<div
+id="categoryChart"
+class="category-chart">
+
+<p class="empty-message">
+Add expenses to see your spending.
+</p>
+
+</div>
+
+</div>
+
+
+<!-- Savings Goal -->
+
+<div class="panel">
+
+<div class="panel-heading">
+
+<div>
+<h3>Savings Goal</h3>
+
+<p>
+Track your progress
+</p>
+</div>
+
+<span id="goalPercentage">
+0%
+</span>
+
+</div>
+
+
+<div class="goal-name"
+id="dashboardGoalName">
+
+No savings goal yet.
+
+</div>
+
+
+<div class="progress-track">
+
+<div
+id="dashboardGoalBar"
+class="progress-bar">
+</div>
+
+</div>
+
+
+<div class="goal-numbers">
+
+<span id="dashboardGoalSaved">
+$0 saved
+</span>
+
+<span id="dashboardGoalTarget">
+Goal: $0
+</span>
+
+</div>
+
+
+<button
+class="secondary-button"
+id="dashboardGoalButton">
+
+Set Savings Goal
+
+</button>
+
+</div>
+
+</div>
+
+
+<!-- ================= RECENT TRANSACTIONS ================= -->
+
+<div class="panel recent-panel">
+
+<div class="panel-heading">
+
+<div>
+<h3>Recent Transactions</h3>
+
+<p>
+Your latest financial activity
+</p>
+</div>
+
+<button
+class="text-button"
+data-page-link="transactions">
+
+View All
+
+</button>
+
+</div>
+
+
+<div id="recentTransactions">
+
+<p class="empty-message">
+No transactions yet.
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ================= TRANSACTIONS ================= -->
+
+<section
+id="transactions"
+class="page">
+
+<div class="page-heading">
+
+<div>
+
+<p class="eyebrow">
+MONEY ACTIVITY
+</p>
+
+<h2>
+Transactions
+</h2>
+
+<p>
+Manage your income and expenses.
+</p>
+
+</div>
+
+<button
+class="primary-button"
+id="transactionAddButton">
+
++ Add Transaction
+
+</button>
+
+</div>
+
+
+<!-- Search and filter -->
+
+<div class="filters">
+
+<input
+id="searchInput"
+type="search"
+placeholder="🔎 Search transactions..."
+>
+
+
+<select id="typeFilter">
+
+<option value="all">
+All Types
+</option>
+
+<option value="income">
+Income
+</option>
+
+<option value="expense">
+Expenses
+</option>
+
+</select>
+
+
+<select id="categoryFilter">
+
+<option value="all">
+All Categories
+</option>
+
+<option value="Salary">
+Salary
+</option>
+
+<option value="Business">
+Business
+</option>
+
+<option value="Food">
+Food
+</option>
+
+<option value="Housing">
+Housing
+</option>
+
+<option value="Transportation">
+Transportation
+</option>
+
+<option value="Shopping">
+Shopping
+</option>
+
+<option value="Entertainment">
+Entertainment
+</option>
+
+<option value="Bills">
+Bills
+</option>
+
+<option value="Health">
+Health
+</option>
+
+<option value="Other">
+Other
+</option>
+
+</select>
+
+</div>
+
+
+<!-- Transactions -->
+
+<div class="panel">
+
+<div id="transactionList">
+
+<p class="empty-message">
+No transactions found.
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ================= GOALS ================= -->
+
+<section
+id="goals"
+class="page">
+
+<div class="page-heading">
+
+<div>
+
+<p class="eyebrow">
+PLAN AHEAD
+</p>
+
+<h2>
+Savings Goals
+</h2>
+
+<p>
+Create a target and track your progress.
+</p>
+
+</div>
+
+</div>
+
+
+<div class="goal-layout">
+
+
+<!-- Goal Form -->
+
+<div class="panel">
+
+<h3>
+Create Savings Goal
+</h3>
+
+<p>
+Choose something you're saving for.
+</p>
+
+
+<form id="goalForm">
+
+<label>
+Goal Name
+</label>
+
+<input
+id="goalName"
+type="text"
+placeholder="Example: New Car"
+required
+>
+
+
+<label>
+Target Amount
+</label>
+
+<input
+id="goalAmount"
+type="number"
+min="1"
+step="0.01"
+placeholder="Example: 5000"
+required
+>
+
+
+<button
+type="submit"
+class="primary-button">
+
+Save Goal
+
+</button>
+
+</form>
+
+</div>
+
+
+<!-- Goal Display -->
+
+<div class="panel goal-display">
+
+<div class="big-goal-icon">
+🎯
+</div>
+
+<h3 id="goalDisplayName">
+No Goal
+</h3>
+
+<p>
+Your savings progress
+</p>
+
+
+<div class="large-progress">
+
+<div
+id="goalDisplayBar"
+class="progress-bar">
+</div>
+
+</div>
+
+
+<div class="goal-display-numbers">
+
+<strong id="goalDisplaySaved">
+$0
+</strong>
+
+<span id="goalDisplayTarget">
+of $0
+</span>
+
+</div>
+
+
+<h4 id="goalDisplayPercentage">
+0% Complete
+</h4>
+
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+
+
+<!-- ================= ADD TRANSACTION MODAL ================= -->
+
+<div
+id="transactionModal"
+class="modal hidden">
+
+<div class="modal-box">
+
+<button
+id="closeTransactionModal"
+class="close-button">
+
+×
+
+</button>
+
+
+<h2>
+Add Transaction
+</h2>
+
+<p>
+Add income or an expense.
+</p>
+
+
+<form id="transactionForm">
+
+
+<!-- Type -->
+
+<label>
+Transaction Type
+</label>
+
+<div class="type-buttons">
+
+<button
+type="button"
+class="type-button selected"
+data-type="income">
+
+📈 Income
+
+</button>
+
+
+<button
+type="button"
+class="type-button"
+data-type="expense">
+
+📉 Expense
+
+</button>
+
+</div>
+
+
+<input
+type="hidden"
+id="transactionType"
+value="income"
+>
+
+
+<!-- Amount -->
+
+<label for="amount">
+Amount
+</label>
+
+<input
+id="amount"
+type="number"
+min="0.01"
+step="0.01"
+placeholder="0.00"
+required
+>
+
+
+<!-- Description -->
+
+<label for="description">
+Description
+</label>
+
+<input
+id="description"
+type="text"
+placeholder="Example: Monthly salary"
+required
+>
+
+
+<!-- Category -->
+
+<label for="category">
+Category
+</label>
+
+<select
+id="category"
+required>
+
+<option value="Salary">
+Salary
+</option>
+
+<option value="Business">
+Business
+</option>
+
+<option value="Food">
+Food
+</option>
+
+<option value="Housing">
+Housing
+</option>
+
+<option value="Transportation">
+Transportation
+</option>
+
+<option value="Shopping">
+Shopping
+</option>
+
+<option value="Entertainment">
+Entertainment
+</option>
+
+<option value="Bills">
+Bills
+</option>
+
+<option value="Health">
+Health
+</option>
+
+<option value="Other">
+Other
+</option>
+
+</select>
+
+
+<!-- Date -->
+
+<label for="transactionDate">
+Date
+</label>
+
+<input
+id="transactionDate"
+type="date"
+required
+>
+
+
+<button
+type="submit"
+class="primary-button full-width">
+
+Add Transaction
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+
+
+<!-- ================= TOAST ================= -->
+
+<div
+id="toast"
+class="toast">
+
+</div>
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script src="script.js"></script>
+
+</body>
+</html>

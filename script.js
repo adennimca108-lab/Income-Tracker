@@ -1,168 +1,46 @@
-// ==========================================
-// FINANCIAL TRACKER
-// ==========================================
+/* =====================================================
+FINANCIAL TRACKER
+===================================================== */
 
 
-// ---------- DEFAULT DATA ----------
+/* ================= STORAGE ================= */
+
+const TRANSACTION_KEY = "financialTrackerTransactions";
+const GOAL_KEY = "financialTrackerGoal";
+
 
 let transactions = JSON.parse(
-localStorage.getItem("transactions")
-) || [
-{
-id: 1,
-description: "Other",
-amount: 0.99,
-type: "expense",
-category: "Other",
-date: "2026-08-28"
-},
-{
-id: 2,
-description: "2 paychecks",
-amount: 2000,
-type: "income",
-category: "Salary",
-date: "2026-08-28"
-},
-{
-id: 3,
-description: "Transferred by nimo",
-amount: 200,
-type: "expense",
-category: "Food",
-date: "2026-08-27"
-}
-];
+localStorage.getItem(TRANSACTION_KEY)
+) || [];
+
+let savingsGoal = JSON.parse(
+localStorage.getItem(GOAL_KEY)
+) || null;
 
 
-let goal = JSON.parse(
-localStorage.getItem("savingsGoal")
-) || {
-name: "Save every paycheck",
-target: 1000
-};
-
-
-// ---------- SAVE DATA ----------
+/* ================= HELPERS ================= */
 
 function saveTransactions() {
+
 localStorage.setItem(
-"transactions",
+TRANSACTION_KEY,
 JSON.stringify(transactions)
 );
+
 }
 
 
 function saveGoal() {
+
 localStorage.setItem(
-"savingsGoal",
-JSON.stringify(goal)
+GOAL_KEY,
+JSON.stringify(savingsGoal)
 );
-}
-
-
-// ---------- PAGE NAVIGATION ----------
-
-const navButtons = document.querySelectorAll(".nav-btn");
-
-navButtons.forEach(function(button) {
-
-button.addEventListener("click", function() {
-
-const pageName = button.dataset.page;
-
-showPage(pageName);
-
-});
-
-});
-
-
-function showPage(pageName) {
-
-document.querySelectorAll(".page").forEach(function(page) {
-page.classList.remove("active-page");
-});
-
-const selectedPage = document.getElementById(pageName);
-
-if (selectedPage) {
-selectedPage.classList.add("active-page");
-}
-
-
-navButtons.forEach(function(button) {
-
-button.classList.remove("active");
-
-if (button.dataset.page === pageName) {
-button.classList.add("active");
-}
-
-});
-
-
-window.scrollTo({
-top: 0,
-behavior: "smooth"
-});
 
 }
 
 
-// ---------- CALCULATE TOTALS ----------
-
-function calculateTotals() {
-
-let income = 0;
-let expenses = 0;
-
-transactions.forEach(function(transaction) {
-
-if (transaction.type === "income") {
-income += Number(transaction.amount);
-} else {
-expenses += Number(transaction.amount);
-}
-
-});
-
-const balance = income - expenses;
-
-return {
-income,
-expenses,
-balance
-};
-
-}
-
-
-// ---------- UPDATE DASHBOARD ----------
-
-function updateDashboard() {
-
-const totals = calculateTotals();
-
-document.getElementById("balance").textContent =
-formatMoney(totals.balance);
-
-document.getElementById("income").textContent =
-formatMoney(totals.income);
-
-document.getElementById("expenses").textContent =
-formatMoney(totals.expenses);
-
-updateGoalDisplay();
-
-renderRecentTransactions();
-
-}
-
-
-// ---------- MONEY FORMAT ----------
-
-function formatMoney(amount) {
+function money(amount) {
 
 return new Intl.NumberFormat("en-US", {
 style: "currency",
@@ -172,150 +50,145 @@ currency: "USD"
 }
 
 
-// ---------- DATE FORMAT ----------
+function escapeHTML(value) {
 
-function formatDate(dateString) {
+return String(value)
+.replaceAll("&", "&amp;")
+.replaceAll("<", "&lt;")
+.replaceAll(">", "&gt;")
+.replaceAll('"', "&quot;")
+.replaceAll("'", "&#039;");
 
-const date = new Date(dateString + "T00:00:00");
+}
 
-return date.toLocaleDateString("en-US", {
-month: "short",
-day: "numeric",
-year: "numeric"
+
+/* ================= NAVIGATION ================= */
+
+const navButtons = document.querySelectorAll(".nav-btn");
+
+const pages = document.querySelectorAll(".page");
+
+
+navButtons.forEach(button => {
+
+button.addEventListener("click", () => {
+
+const pageName = button.dataset.page;
+
+pages.forEach(page => {
+page.classList.remove("active-page");
 });
 
+const selectedPage =
+document.getElementById(pageName);
+
+if (selectedPage) {
+selectedPage.classList.add("active-page");
 }
 
 
-// ---------- ICON ----------
+navButtons.forEach(btn => {
+btn.classList.remove("active");
+});
 
-function getIcon(transaction) {
-
-if (transaction.type === "income") {
-return "📈";
-}
-
-if (transaction.category === "Food") {
-return "🍔";
-}
-
-if (transaction.category === "Shopping") {
-return "🛍️";
-}
-
-if (transaction.category === "Transportation") {
-return "🚗";
-}
-
-if (transaction.category === "Bills") {
-return "🧾";
-}
-
-if (transaction.category === "Housing") {
-return "🏠";
-}
-
-return "📉";
-
-}
+button.classList.add("active");
 
 
-// ---------- TRANSACTION HTML ----------
+window.scrollTo({
+top: 0,
+behavior: "smooth"
+});
 
-function transactionHTML(transaction, showDelete = false) {
+});
 
-const isIncome = transaction.type === "income";
-
-const sign = isIncome ? "+" : "-";
-
-const iconClass = isIncome
-? "income-icon"
-: "expense-icon";
-
-const amountClass = isIncome
-? "income-amount"
-: "expense-amount";
+});
 
 
-return `
-<div class="transaction">
+/* ================= CALCULATIONS ================= */
 
-<div class="transaction-left">
+function getIncome() {
 
-<div class="transaction-icon ${iconClass}">
-${getIcon(transaction)}
-</div>
-
-<div>
-<h3>${escapeHTML(transaction.description)}</h3>
-
-<p>
-${escapeHTML(transaction.category)}
-•
-${formatDate(transaction.date)}
-</p>
-</div>
-
-</div>
-
-<div>
-<span class="transaction-amount ${amountClass}">
-${sign} ${formatMoney(Number(transaction.amount))}
-</span>
-
-${
-showDelete
-?
-`<button
-class="delete-btn"
-onclick="deleteTransaction(${transaction.id})">
-Delete
-</button>`
-:
-""
-}
-
-</div>
-
-</div>
-`;
+return transactions
+.filter(transaction => transaction.type === "income")
+.reduce(
+(total, transaction) =>
+total + Number(transaction.amount),
+0
+);
 
 }
 
 
-// ---------- RECENT TRANSACTIONS ----------
+function getExpenses() {
+
+return transactions
+.filter(transaction => transaction.type === "expense")
+.reduce(
+(total, transaction) =>
+total + Number(transaction.amount),
+0
+);
+
+}
+
+
+function getBalance() {
+
+return getIncome() - getExpenses();
+
+}
+
+
+/* ================= DASHBOARD ================= */
+
+function updateDashboard() {
+
+document.getElementById("dashboardBalance").textContent =
+money(getBalance());
+
+document.getElementById("dashboardIncome").textContent =
+money(getIncome());
+
+document.getElementById("dashboardExpenses").textContent =
+money(getExpenses());
+
+
+updateGoalDisplay();
+
+renderRecentTransactions();
+
+}
+
+
+/* ================= TRANSACTIONS ================= */
 
 function renderRecentTransactions() {
 
 const container =
 document.getElementById("recentTransactions");
 
+
 if (transactions.length === 0) {
 
-container.innerHTML =
-`<div class="empty">No transactions yet.</div>`;
+container.innerHTML = `
+<div class="empty">
+No transactions yet.
+</div>
+`;
 
 return;
 }
 
 
-const recent = [...transactions]
-.sort(function(a, b) {
-return new Date(b.date) - new Date(a.date);
-})
-.slice(0, 5);
+const recent =
+transactions.slice(0, 5);
 
 
-container.innerHTML = recent
-.map(function(transaction) {
-return transactionHTML(transaction, false);
-})
-.join("");
+container.innerHTML =
+recent.map(createTransactionHTML).join("");
 
 }
 
-
-// ---------- ALL TRANSACTIONS ----------
 
 function renderAllTransactions() {
 
@@ -325,44 +198,247 @@ document.getElementById("allTransactions");
 
 if (transactions.length === 0) {
 
-container.innerHTML =
-`<div class="empty">No transactions yet.</div>`;
+container.innerHTML = `
+<div class="empty">
+No transactions yet.
+</div>
+`;
 
 return;
 }
 
 
-const sorted = [...transactions]
-.sort(function(a, b) {
-return new Date(b.date) - new Date(a.date);
-});
-
-
-container.innerHTML = sorted
-.map(function(transaction) {
-return transactionHTML(transaction, true);
-})
+container.innerHTML =
+transactions
+.map(createTransactionHTML)
 .join("");
 
 }
 
 
-// ---------- DELETE TRANSACTION ----------
+function createTransactionHTML(transaction) {
 
-function deleteTransaction(id) {
+const isIncome =
+transaction.type === "income";
 
-const transaction = transactions.find(function(item) {
-return item.id === id;
+
+const icon =
+isIncome ? "📈" : "📉";
+
+
+const amount =
+isIncome
+? `+ ${money(transaction.amount)}`
+: `- ${money(transaction.amount)}`;
+
+
+const amountClass =
+isIncome
+? "income-amount"
+: "expense-amount";
+
+
+const iconClass =
+isIncome
+? "income-icon"
+: "expense-icon";
+
+
+const date =
+new Date(transaction.date)
+.toLocaleDateString("en-US", {
+month: "short",
+day: "numeric",
+year: "numeric"
 });
 
 
-if (!transaction) {
+return `
+
+<div class="transaction">
+
+<div class="transaction-left">
+
+<div class="transaction-icon ${iconClass}">
+${icon}
+</div>
+
+<div class="transaction-info">
+
+<h3>
+${escapeHTML(transaction.name)}
+</h3>
+
+<p>
+${escapeHTML(transaction.category)}
+• ${date}
+</p>
+
+</div>
+
+</div>
+
+
+<div class="transaction-right">
+
+<span class="${amountClass}">
+${amount}
+</span>
+
+<button
+class="delete-button"
+data-id="${transaction.id}"
+title="Delete transaction"
+>
+🗑️
+</button>
+
+</div>
+
+</div>
+
+`;
+
+}
+
+
+/* ================= ADD TRANSACTION ================= */
+
+const transactionForm =
+document.getElementById("transactionForm");
+
+
+transactionForm.addEventListener("submit", event => {
+
+event.preventDefault();
+
+
+const name =
+document.getElementById("transactionName")
+.value.trim();
+
+
+const amount =
+Number(
+document.getElementById("transactionAmount")
+.value
+);
+
+
+const type =
+document.getElementById("transactionType")
+.value;
+
+
+const category =
+document.getElementById("transactionCategory")
+.value;
+
+
+if (!name || amount <= 0) {
+
+alert("Please enter a valid description and amount.");
+
 return;
 }
 
 
-const confirmed = confirm(
-`Delete "${transaction.description}"?`
+const transaction = {
+
+id: Date.now(),
+
+name: name,
+
+amount: amount,
+
+type: type,
+
+category: category,
+
+date: new Date().toISOString()
+
+};
+
+
+transactions.unshift(transaction);
+
+
+saveTransactions();
+
+
+transactionForm.reset();
+
+
+updateDashboard();
+
+renderAllTransactions();
+
+
+alert("Transaction added successfully! 💰");
+
+});
+
+
+/* ================= DELETE TRANSACTION ================= */
+
+document.addEventListener("click", event => {
+
+const deleteButton =
+event.target.closest(".delete-button");
+
+
+if (!deleteButton) {
+return;
+}
+
+
+const id =
+Number(deleteButton.dataset.id);
+
+
+const confirmed =
+confirm("Delete this transaction?");
+
+
+if (!confirmed) {
+return;
+}
+
+
+transactions =
+transactions.filter(
+transaction => transaction.id !== id
+);
+
+
+saveTransactions();
+
+
+updateDashboard();
+
+renderAllTransactions();
+
+});
+
+
+/* ================= CLEAR TRANSACTIONS ================= */
+
+document
+.getElementById("clearTransactionsButton")
+.addEventListener("click", () => {
+
+
+if (transactions.length === 0) {
+
+alert("There are no transactions to delete.");
+
+return;
+}
+
+
+const confirmed =
+confirm(
+"Are you sure you want to delete ALL transactions?"
 );
 
 
@@ -371,321 +447,355 @@ return;
 }
 
 
-transactions = transactions.filter(function(item) {
-return item.id !== id;
-});
+transactions = [];
 
 
 saveTransactions();
 
+
 updateDashboard();
+
 renderAllTransactions();
+
+});
+
+
+/* ================= GOAL CALCULATION ================= */
+
+function getSavingsAmount() {
+
+/*
+For this simple tracker, savings is based on
+your current positive balance.
+*/
+
+return Math.max(getBalance(), 0);
 
 }
 
 
-// Make function available to HTML onclick
-window.deleteTransaction = deleteTransaction;
+function getGoalPercentage() {
+
+if (!savingsGoal) {
+return 0;
+}
 
 
-// ---------- ADD TRANSACTION ----------
+if (savingsGoal.target <= 0) {
+return 0;
+}
 
-const transactionForm =
-document.getElementById("transactionForm");
+
+const percentage =
+(getSavingsAmount() / savingsGoal.target) * 100;
 
 
-transactionForm.addEventListener("submit", function(event) {
+return Math.min(
+Math.max(percentage, 0),
+100
+);
+
+}
+
+
+/* ================= UPDATE GOAL ================= */
+
+function updateGoalDisplay() {
+
+const percentage =
+getGoalPercentage();
+
+
+const saved =
+getSavingsAmount();
+
+
+const target =
+savingsGoal
+? Number(savingsGoal.target)
+: 0;
+
+
+const name =
+savingsGoal
+? savingsGoal.name
+: "No savings goal yet";
+
+
+/* Dashboard */
+
+document.getElementById("goalPercent")
+.textContent =
+`${Math.round(percentage)}%`;
+
+
+document.getElementById("dashboardGoalName")
+.textContent = name;
+
+
+document.getElementById("goalProgressBar")
+.style.width =
+`${percentage}%`;
+
+
+document.getElementById("goalSaved")
+.textContent =
+`${money(saved)} saved`;
+
+
+document.getElementById("goalTarget")
+.textContent =
+`Goal: ${money(target)}`;
+
+
+/* Savings page */
+
+document.getElementById("savingsGoalTitle")
+.textContent = name;
+
+
+document.getElementById("savingsPercent")
+.textContent =
+`${Math.round(percentage)}%`;
+
+
+document.getElementById("savingsProgressBar")
+.style.width =
+`${percentage}%`;
+
+
+document.getElementById("savingsSaved")
+.textContent =
+`${money(saved)} saved`;
+
+
+document.getElementById("savingsTarget")
+.textContent =
+`Goal: ${money(target)}`;
+
+}
+
+
+/* ================= SAVINGS GOAL FORM ================= */
+
+const goalForm =
+document.getElementById("goalForm");
+
+
+goalForm.addEventListener("submit", event => {
 
 event.preventDefault();
 
 
-const description =
-document.getElementById("description").value.trim();
-
-const amount =
-Number(document.getElementById("amount").value);
-
-const type =
-document.getElementById("type").value;
-
-const category =
-document.getElementById("category").value;
-
-const date =
-document.getElementById("date").value;
-
-
-if (!description || amount <= 0 || !date) {
-
-alert("Please fill in all fields correctly.");
-
-return;
-}
-
-
-const newTransaction = {
-
-id: Date.now(),
-
-description: description,
-
-amount: amount,
-
-type: type,
-
-category: category,
-
-date: date
-
-};
-
-
-transactions.push(newTransaction);
-
-saveTransactions();
-
-
-transactionForm.reset();
-
-
-document.getElementById("date").value =
-getToday();
-
-
-updateDashboard();
-
-renderAllTransactions();
-
-
-alert("Transaction added successfully!");
-
-
-showPage("transactions");
-
-});
-
-
-// ---------- SAVINGS GOAL ----------
-
-function updateGoalDisplay() {
-
-const totals = calculateTotals();
-
-
-// Amount saved is income minus expenses,
-// but never show a negative savings amount.
-const saved = Math.max(0, totals.balance);
-
-
-let percent = 0;
-
-if (goal.target > 0) {
-
-percent =
-Math.round((saved / goal.target) * 100);
-
-}
-
-
-percent = Math.min(percent, 100);
-
-
-// Dashboard
-
-document.getElementById("goalName").textContent =
-goal.name;
-
-document.getElementById("goalPercent").textContent =
-percent + "%";
-
-document.getElementById("goalProgress").style.width =
-percent + "%";
-
-document.getElementById("savedAmount").textContent =
-formatMoney(saved) + " saved";
-
-document.getElementById("goalAmount").textContent =
-"Goal: " + formatMoney(goal.target);
-
-
-// Savings page
-
-document.getElementById("savingsGoalName").textContent =
-goal.name;
-
-document.getElementById("savingsPercent").textContent =
-percent + "%";
-
-document.getElementById("savingsProgress").style.width =
-percent + "%";
-
-document.getElementById("savingsSaved").textContent =
-formatMoney(saved) + " saved";
-
-document.getElementById("savingsTarget").textContent =
-"Target: " + formatMoney(goal.target);
-
-document.getElementById("savingsGoalDetails").textContent =
-`${formatMoney(saved)} of ${formatMoney(goal.target)} saved.`;
-
-}
-
-
-// ---------- OPEN GOAL MODAL ----------
-
-const goalModal =
-document.getElementById("goalModal");
-
-
-function openGoalModal() {
-
-document.getElementById("goalTitle").value =
-goal.name;
-
-document.getElementById("goalTarget").value =
-goal.target;
-
-goalModal.classList.add("show");
-
-}
-
-
-// ---------- CLOSE GOAL MODAL ----------
-
-function closeGoalModal() {
-
-goalModal.classList.remove("show");
-
-}
-
-
-document
-.getElementById("setGoalBtn")
-.addEventListener("click", openGoalModal);
-
-
-document
-.getElementById("changeGoalBtn")
-.addEventListener("click", openGoalModal);
-
-
-document
-.getElementById("closeModal")
-.addEventListener("click", closeGoalModal);
-
-
-// Close when clicking outside modal
-
-goalModal.addEventListener("click", function(event) {
-
-if (event.target === goalModal) {
-closeGoalModal();
-}
-
-});
-
-
-// ---------- SAVE GOAL ----------
-
-document
-.getElementById("saveGoalBtn")
-.addEventListener("click", function() {
-
 const name =
-document.getElementById("goalTitle")
-.value
-.trim();
+document.getElementById("goalName")
+.value.trim();
+
 
 const target =
 Number(
-document.getElementById("goalTarget").value
+document.getElementById("goalAmount")
+.value
 );
 
 
-if (!name) {
+if (!name || target <= 0) {
 
-alert("Please enter a goal name.");
-
-return;
-}
-
-
-if (!target || target <= 0) {
-
-alert("Please enter a valid target amount.");
+alert("Please enter a valid goal and amount.");
 
 return;
 }
 
 
-goal = {
+savingsGoal = {
+
 name: name,
+
 target: target
+
 };
 
 
 saveGoal();
 
-updateGoalDisplay();
 
-closeGoalModal();
+goalForm.reset();
 
 
-alert("Savings goal saved successfully!");
+updateDashboard();
+
+
+alert("Savings goal saved successfully! 🎯");
 
 });
 
 
-// ---------- VIEW ALL ----------
+/* ================= MODAL ================= */
+
+const goalModal =
+document.getElementById("goalModal");
+
+
+const openGoalButton =
+document.getElementById("openGoalButton");
+
+
+const closeGoalModal =
+document.getElementById("closeGoalModal");
+
+
+const goalModalForm =
+document.getElementById("goalModalForm");
+
+
+/*
+OPEN MODAL
+*/
+
+openGoalButton.addEventListener("click", () => {
+
+goalModal.classList.add("show");
+
+});
+
+
+/*
+CLOSE MODAL
+*/
+
+closeGoalModal.addEventListener("click", () => {
+
+goalModal.classList.remove("show");
+
+});
+
+
+/*
+CLOSE WHEN CLICKING OUTSIDE
+*/
+
+goalModal.addEventListener("click", event => {
+
+if (event.target === goalModal) {
+
+goalModal.classList.remove("show");
+
+}
+
+});
+
+
+/*
+CLOSE WITH ESC KEY
+*/
+
+document.addEventListener("keydown", event => {
+
+if (
+event.key === "Escape" &&
+goalModal.classList.contains("show")
+) {
+
+goalModal.classList.remove("show");
+
+}
+
+});
+
+
+/*
+SAVE GOAL FROM MODAL
+*/
+
+goalModalForm.addEventListener("submit", event => {
+
+event.preventDefault();
+
+
+const name =
+document.getElementById("modalGoalName")
+.value.trim();
+
+
+const target =
+Number(
+document.getElementById("modalGoalAmount")
+.value
+);
+
+
+if (!name || target <= 0) {
+
+alert("Please enter a valid goal and amount.");
+
+return;
+}
+
+
+savingsGoal = {
+
+name: name,
+
+target: target
+
+};
+
+
+saveGoal();
+
+
+goalModalForm.reset();
+
+
+goalModal.classList.remove("show");
+
+
+updateDashboard();
+
+
+alert("Savings goal saved successfully! 🎯");
+
+});
+
+
+/* ================= VIEW ALL ================= */
 
 document
-.getElementById("viewAllBtn")
-.addEventListener("click", function() {
+.getElementById("viewAllButton")
+.addEventListener("click", () => {
+
+pages.forEach(page => {
+page.classList.remove("active-page");
+});
+
+
+document
+.getElementById("transactions")
+.classList.add("active-page");
+
+
+navButtons.forEach(button => {
+button.classList.remove("active");
+});
+
+
+document
+.querySelector('[data-page="transactions"]')
+.classList.add("active");
+
 
 renderAllTransactions();
 
-showPage("transactions");
+
+window.scrollTo({
+top: 0,
+behavior: "smooth"
+});
 
 });
 
 
-// ---------- TODAY ----------
-
-function getToday() {
-
-const today = new Date();
-
-const year = today.getFullYear();
-
-const month =
-String(today.getMonth() + 1).padStart(2, "0");
-
-const day =
-String(today.getDate()).padStart(2, "0");
-
-return `${year}-${month}-${day}`;
-
-}
-
-
-// ---------- SECURITY ----------
-
-function escapeHTML(text) {
-
-return String(text)
-.replace(/&/g, "&amp;")
-.replace(/</g, "&lt;")
-.replace(/>/g, "&gt;")
-.replace(/"/g, "&quot;")
-.replace(/'/g, "&#039;");
-
-}
-
-
-// ---------- START APP ----------
-
-document.getElementById("date").value =
-getToday();
+/* ================= INITIAL LOAD ================= */
 
 updateDashboard();
 

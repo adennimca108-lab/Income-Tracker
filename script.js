@@ -1,579 +1,692 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+// ==========================================
+// FINANCIAL TRACKER
+// ==========================================
 
-<meta name="theme-color" content="#172b3a">
 
-<title>Financial Tracker</title>
+// ---------- DEFAULT DATA ----------
 
-<link rel="stylesheet" href="style.css">
-</head>
+let transactions = JSON.parse(
+localStorage.getItem("transactions")
+) || [
+{
+id: 1,
+description: "Other",
+amount: 0.99,
+type: "expense",
+category: "Other",
+date: "2026-08-28"
+},
+{
+id: 2,
+description: "2 paychecks",
+amount: 2000,
+type: "income",
+category: "Salary",
+date: "2026-08-28"
+},
+{
+id: 3,
+description: "Transferred by nimo",
+amount: 200,
+type: "expense",
+category: "Food",
+date: "2026-08-27"
+}
+];
 
-<body>
 
-<header class="top-header">
+let goal = JSON.parse(
+localStorage.getItem("savingsGoal")
+) || {
+name: "Save every paycheck",
+target: 1000
+};
 
-<div class="brand">
-<div class="logo">💰</div>
+
+// ---------- SAVE DATA ----------
+
+function saveTransactions() {
+localStorage.setItem(
+"transactions",
+JSON.stringify(transactions)
+);
+}
+
+
+function saveGoal() {
+localStorage.setItem(
+"savingsGoal",
+JSON.stringify(goal)
+);
+}
+
+
+// ---------- PAGE NAVIGATION ----------
+
+const navButtons = document.querySelectorAll(".nav-btn");
+
+navButtons.forEach(function(button) {
+
+button.addEventListener("click", function() {
+
+const pageName = button.dataset.page;
+
+showPage(pageName);
+
+});
+
+});
+
+
+function showPage(pageName) {
+
+document.querySelectorAll(".page").forEach(function(page) {
+page.classList.remove("active-page");
+});
+
+const selectedPage = document.getElementById(pageName);
+
+if (selectedPage) {
+selectedPage.classList.add("active-page");
+}
+
+
+navButtons.forEach(function(button) {
+
+button.classList.remove("active");
+
+if (button.dataset.page === pageName) {
+button.classList.add("active");
+}
+
+});
+
+
+window.scrollTo({
+top: 0,
+behavior: "smooth"
+});
+
+}
+
+
+// ---------- CALCULATE TOTALS ----------
+
+function calculateTotals() {
+
+let income = 0;
+let expenses = 0;
+
+transactions.forEach(function(transaction) {
+
+if (transaction.type === "income") {
+income += Number(transaction.amount);
+} else {
+expenses += Number(transaction.amount);
+}
+
+});
+
+const balance = income - expenses;
+
+return {
+income,
+expenses,
+balance
+};
+
+}
+
+
+// ---------- UPDATE DASHBOARD ----------
+
+function updateDashboard() {
+
+const totals = calculateTotals();
+
+document.getElementById("balance").textContent =
+formatMoney(totals.balance);
+
+document.getElementById("income").textContent =
+formatMoney(totals.income);
+
+document.getElementById("expenses").textContent =
+formatMoney(totals.expenses);
+
+updateGoalDisplay();
+
+renderRecentTransactions();
+
+}
+
+
+// ---------- MONEY FORMAT ----------
+
+function formatMoney(amount) {
+
+return new Intl.NumberFormat("en-US", {
+style: "currency",
+currency: "USD"
+}).format(amount);
+
+}
+
+
+// ---------- DATE FORMAT ----------
+
+function formatDate(dateString) {
+
+const date = new Date(dateString + "T00:00:00");
+
+return date.toLocaleDateString("en-US", {
+month: "short",
+day: "numeric",
+year: "numeric"
+});
+
+}
+
+
+// ---------- ICON ----------
+
+function getIcon(transaction) {
+
+if (transaction.type === "income") {
+return "📈";
+}
+
+if (transaction.category === "Food") {
+return "🍔";
+}
+
+if (transaction.category === "Shopping") {
+return "🛍️";
+}
+
+if (transaction.category === "Transportation") {
+return "🚗";
+}
+
+if (transaction.category === "Bills") {
+return "🧾";
+}
+
+if (transaction.category === "Housing") {
+return "🏠";
+}
+
+return "📉";
+
+}
+
+
+// ---------- TRANSACTION HTML ----------
+
+function transactionHTML(transaction, showDelete = false) {
+
+const isIncome = transaction.type === "income";
+
+const sign = isIncome ? "+" : "-";
+
+const iconClass = isIncome
+? "income-icon"
+: "expense-icon";
+
+const amountClass = isIncome
+? "income-amount"
+: "expense-amount";
+
+
+return `
+<div class="transaction">
+
+<div class="transaction-left">
+
+<div class="transaction-icon ${iconClass}">
+${getIcon(transaction)}
+</div>
 
 <div>
-<h1>Financial Tracker</h1>
-<p>Take control of your money</p>
-</div>
-</div>
-
-<nav>
-<button class="nav-btn active" data-page="dashboard">
-Dashboard
-</button>
-
-<button class="nav-btn" data-page="transactions">
-Transactions
-</button>
-
-<button class="nav-btn" data-page="goals">
-Savings Goals
-</button>
-</nav>
-
-</header>
-
-
-<main>
-
-<!-- ================= DASHBOARD ================= -->
-
-<section id="dashboard" class="page active">
-
-<div class="page-heading">
-
-<div>
-<p class="eyebrow">YOUR MONEY</p>
-
-<h2>Financial Dashboard</h2>
+<h3>${escapeHTML(transaction.description)}</h3>
 
 <p>
-Track your income, expenses and savings.
+${escapeHTML(transaction.category)}
+•
+${formatDate(transaction.date)}
 </p>
 </div>
 
-<button id="dashboardAddBtn" class="primary-btn">
-+ Add Transaction
-</button>
-
 </div>
-
-
-<!-- SUMMARY CARDS -->
-
-<div class="summary-grid">
-
-<div class="summary-card">
-<div class="summary-icon">💳</div>
-<p>Balance</p>
-<h3 id="balance">$0.00</h3>
-</div>
-
-
-<div class="summary-card">
-<div class="summary-icon">📈</div>
-<p>Income</p>
-<h3 id="income">$0.00</h3>
-</div>
-
-
-<div class="summary-card">
-<div class="summary-icon">📉</div>
-<p>Expenses</p>
-<h3 id="expenses">$0.00</h3>
-</div>
-
-
-<div class="summary-card">
-<div class="summary-icon">🎯</div>
-<p>Saved</p>
-<h3 id="saved">$0.00</h3>
-</div>
-
-</div>
-
-
-<!-- DASHBOARD GRID -->
-
-<div class="dashboard-grid">
-
-<!-- SPENDING -->
-
-<div class="panel">
-
-<h3>Spending Overview</h3>
-
-<p class="muted">
-Your expenses by category
-</p>
-
-<div id="spendingChart">
-</div>
-
-</div>
-
-
-<!-- SAVINGS -->
-
-<div class="panel">
-
-<div class="panel-header">
 
 <div>
-<h3 id="dashboardGoalName">
-Savings Goal
-</h3>
-
-<p id="dashboardGoalText" class="muted">
-No goal yet.
-</p>
-</div>
-
-<span id="dashboardGoalPercent">
-0%
+<span class="transaction-amount ${amountClass}">
+${sign} ${formatMoney(Number(transaction.amount))}
 </span>
 
-</div>
-
-
-<div class="progress-bar">
-<div id="dashboardProgress"></div>
-</div>
-
-
-<div class="goal-numbers">
-
-<strong id="dashboardSaved">
-$0.00 saved
-</strong>
-
-<span id="dashboardTarget">
-Goal: $0.00
-</span>
-
-</div>
-
-
-<button id="dashboardGoalBtn" class="secondary-btn">
-Set Savings Goal
-</button>
+${
+showDelete
+?
+`<button
+class="delete-btn"
+onclick="deleteTransaction(${transaction.id})">
+Delete
+</button>`
+:
+""
+}
 
 </div>
 
 </div>
+`;
 
+}
 
-<!-- RECENT TRANSACTIONS -->
 
-<div class="panel">
+// ---------- RECENT TRANSACTIONS ----------
 
-<div class="panel-header">
+function renderRecentTransactions() {
 
-<div>
-<h3>Recent Transactions</h3>
+const container =
+document.getElementById("recentTransactions");
 
-<p class="muted">
-Your latest financial activity
-</p>
-</div>
+if (transactions.length === 0) {
 
-<button
-id="viewAllBtn"
-class="text-btn">
-View All
-</button>
+container.innerHTML =
+`<div class="empty">No transactions yet.</div>`;
 
-</div>
+return;
+}
 
 
-<div id="recentTransactions">
-</div>
+const recent = [...transactions]
+.sort(function(a, b) {
+return new Date(b.date) - new Date(a.date);
+})
+.slice(0, 5);
 
-</div>
 
-</section>
+container.innerHTML = recent
+.map(function(transaction) {
+return transactionHTML(transaction, false);
+})
+.join("");
 
+}
 
 
-<!-- ================= TRANSACTIONS ================= -->
+// ---------- ALL TRANSACTIONS ----------
 
-<section id="transactions" class="page">
+function renderAllTransactions() {
 
-<div class="page-heading">
+const container =
+document.getElementById("allTransactions");
 
-<div>
 
-<p class="eyebrow">
-MONEY ACTIVITY
-</p>
+if (transactions.length === 0) {
 
-<h2>Transactions</h2>
+container.innerHTML =
+`<div class="empty">No transactions yet.</div>`;
 
-<p>
-Add, search and remove your transactions.
-</p>
+return;
+}
 
-</div>
 
+const sorted = [...transactions]
+.sort(function(a, b) {
+return new Date(b.date) - new Date(a.date);
+});
 
-<button id="transactionsAddBtn"
-class="primary-btn">
 
-+ Add Transaction
+container.innerHTML = sorted
+.map(function(transaction) {
+return transactionHTML(transaction, true);
+})
+.join("");
 
-</button>
+}
 
-</div>
 
+// ---------- DELETE TRANSACTION ----------
 
-<!-- FILTERS -->
+function deleteTransaction(id) {
 
-<div class="filters">
+const transaction = transactions.find(function(item) {
+return item.id === id;
+});
 
-<input
-id="searchInput"
-type="search"
-placeholder="🔎 Search transactions">
 
+if (!transaction) {
+return;
+}
 
-<select id="typeFilter">
 
-<option value="all">
-All Types
-</option>
+const confirmed = confirm(
+`Delete "${transaction.description}"?`
+);
 
-<option value="income">
-Income
-</option>
 
-<option value="expense">
-Expenses
-</option>
+if (!confirmed) {
+return;
+}
 
-</select>
 
+transactions = transactions.filter(function(item) {
+return item.id !== id;
+});
 
-<select id="categoryFilter">
 
-<option value="all">
-All Categories
-</option>
+saveTransactions();
 
-<option value="Salary">
-Salary
-</option>
+updateDashboard();
+renderAllTransactions();
 
-<option value="Business">
-Business
-</option>
+}
 
-<option value="Freelance">
-Freelance
-</option>
 
-<option value="Investment">
-Investment
-</option>
+// Make function available to HTML onclick
+window.deleteTransaction = deleteTransaction;
 
-<option value="Food">
-Food
-</option>
 
-<option value="Housing">
-Housing
-</option>
+// ---------- ADD TRANSACTION ----------
 
-<option value="Transportation">
-Transportation
-</option>
+const transactionForm =
+document.getElementById("transactionForm");
 
-<option value="Shopping">
-Shopping
-</option>
 
-<option value="Entertainment">
-Entertainment
-</option>
+transactionForm.addEventListener("submit", function(event) {
 
-<option value="Bills">
-Bills
-</option>
+event.preventDefault();
 
-<option value="Health">
-Health
-</option>
 
-<option value="Other">
-Other
-</option>
+const description =
+document.getElementById("description").value.trim();
 
-</select>
+const amount =
+Number(document.getElementById("amount").value);
 
-</div>
+const type =
+document.getElementById("type").value;
 
+const category =
+document.getElementById("category").value;
 
-<div class="panel">
+const date =
+document.getElementById("date").value;
 
-<div id="transactionList">
-</div>
 
-</div>
+if (!description || amount <= 0 || !date) {
 
-</section>
+alert("Please fill in all fields correctly.");
 
+return;
+}
 
 
-<!-- ================= SAVINGS GOALS ================= -->
+const newTransaction = {
 
-<section id="goals" class="page">
+id: Date.now(),
 
-<div class="page-heading">
+description: description,
 
-<div>
+amount: amount,
 
-<p class="eyebrow">
-PLAN AHEAD
-</p>
+type: type,
 
-<h2>Savings Goals</h2>
+category: category,
 
-<p>
-Create a goal and track your progress.
-</p>
+date: date
 
-</div>
+};
 
-</div>
 
+transactions.push(newTransaction);
 
-<div class="dashboard-grid">
+saveTransactions();
 
-<!-- CREATE GOAL -->
 
-<div class="panel">
+transactionForm.reset();
 
-<h3>Create Savings Goal</h3>
 
-<p class="muted">
-Set the amount you want to save.
-</p>
+document.getElementById("date").value =
+getToday();
 
 
-<form id="goalForm">
+updateDashboard();
 
-<label for="goalName">
-Goal Name
-</label>
+renderAllTransactions();
 
-<input
-id="goalName"
-type="text"
-placeholder="Example: New Car"
-required>
 
+alert("Transaction added successfully!");
 
-<label for="goalAmount">
-Target Amount
-</label>
 
-<input
-id="goalAmount"
-type="number"
-min="1"
-step="0.01"
-placeholder="5000"
-required>
+showPage("transactions");
 
+});
 
-<button class="primary-btn"
-type="submit">
 
-Save Goal
+// ---------- SAVINGS GOAL ----------
 
-</button>
+function updateGoalDisplay() {
 
-</form>
+const totals = calculateTotals();
 
-</div>
 
+// Amount saved is income minus expenses,
+// but never show a negative savings amount.
+const saved = Math.max(0, totals.balance);
 
-<!-- GOAL PROGRESS -->
 
-<div class="panel goal-panel">
+let percent = 0;
 
-<div class="goal-icon">
-🎯
-</div>
+if (goal.target > 0) {
 
-<h3 id="goalDisplayName">
-No Goal
-</h3>
+percent =
+Math.round((saved / goal.target) * 100);
 
+}
 
-<div class="progress-bar">
 
-<div id="goalProgressBar"></div>
+percent = Math.min(percent, 100);
 
-</div>
 
+// Dashboard
 
-<p>
+document.getElementById("goalName").textContent =
+goal.name;
 
-<strong id="goalSavedAmount">
-$0.00
-</strong>
+document.getElementById("goalPercent").textContent =
+percent + "%";
 
-<span id="goalTargetAmount">
-of $0.00
-</span>
+document.getElementById("goalProgress").style.width =
+percent + "%";
 
-</p>
+document.getElementById("savedAmount").textContent =
+formatMoney(saved) + " saved";
 
+document.getElementById("goalAmount").textContent =
+"Goal: " + formatMoney(goal.target);
 
-<h3 id="goalPercent">
-0% Complete
-</h3>
 
-</div>
+// Savings page
 
-</div>
+document.getElementById("savingsGoalName").textContent =
+goal.name;
 
-</section>
+document.getElementById("savingsPercent").textContent =
+percent + "%";
 
-</main>
+document.getElementById("savingsProgress").style.width =
+percent + "%";
 
+document.getElementById("savingsSaved").textContent =
+formatMoney(saved) + " saved";
 
+document.getElementById("savingsTarget").textContent =
+"Target: " + formatMoney(goal.target);
 
-<!-- ================= ADD TRANSACTION MODAL ================= -->
+document.getElementById("savingsGoalDetails").textContent =
+`${formatMoney(saved)} of ${formatMoney(goal.target)} saved.`;
 
-<div id="transactionModal"
-class="modal hidden">
+}
 
-<div class="modal-box">
 
-<button id="closeModal"
-class="close-btn">
-×
-</button>
+// ---------- OPEN GOAL MODAL ----------
 
+const goalModal =
+document.getElementById("goalModal");
 
-<h2>Add Transaction</h2>
 
-<p class="muted">
-Enter your income or expense.
-</p>
+function openGoalModal() {
 
+document.getElementById("goalTitle").value =
+goal.name;
 
-<form id="transactionForm">
+document.getElementById("goalTarget").value =
+goal.target;
 
-<label>
-Transaction Type
-</label>
+goalModal.classList.add("show");
 
+}
 
-<div class="transaction-types">
 
-<button
-type="button"
-class="type-btn selected"
-data-type="income">
+// ---------- CLOSE GOAL MODAL ----------
 
-📈 Income
+function closeGoalModal() {
 
-</button>
+goalModal.classList.remove("show");
 
+}
 
-<button
-type="button"
-class="type-btn"
-data-type="expense">
 
-📉 Expense
+document
+.getElementById("setGoalBtn")
+.addEventListener("click", openGoalModal);
 
-</button>
 
-</div>
+document
+.getElementById("changeGoalBtn")
+.addEventListener("click", openGoalModal);
 
 
-<input
-id="transactionType"
-type="hidden"
-value="income">
+document
+.getElementById("closeModal")
+.addEventListener("click", closeGoalModal);
 
 
-<label for="amount">
-Amount
-</label>
+// Close when clicking outside modal
 
-<input
-id="amount"
-type="number"
-min="0.01"
-step="0.01"
-placeholder="100.00"
-required>
+goalModal.addEventListener("click", function(event) {
 
+if (event.target === goalModal) {
+closeGoalModal();
+}
 
-<label for="description">
-Description
-</label>
+});
 
-<input
-id="description"
-type="text"
-placeholder="Example: Monthly salary"
-required>
 
+// ---------- SAVE GOAL ----------
 
-<label for="category">
-Category
-</label>
+document
+.getElementById("saveGoalBtn")
+.addEventListener("click", function() {
 
-<select id="category">
-</select>
+const name =
+document.getElementById("goalTitle")
+.value
+.trim();
 
+const target =
+Number(
+document.getElementById("goalTarget").value
+);
 
-<label for="transactionDate">
-Date
-</label>
 
-<input
-id="transactionDate"
-type="date"
-required>
+if (!name) {
 
+alert("Please enter a goal name.");
 
-<button
-type="submit"
-class="primary-btn">
+return;
+}
 
-Add Transaction
 
-</button>
+if (!target || target <= 0) {
 
-</form>
+alert("Please enter a valid target amount.");
 
-</div>
+return;
+}
 
-</div>
 
+goal = {
+name: name,
+target: target
+};
 
 
-<!-- TOAST -->
+saveGoal();
 
-<div id="toast"
-class="toast">
-</div>
+updateGoalDisplay();
 
+closeGoalModal();
 
-<script src="script.js"></script>
 
-</body>
-</html>
+alert("Savings goal saved successfully!");
+
+});
+
+
+// ---------- VIEW ALL ----------
+
+document
+.getElementById("viewAllBtn")
+.addEventListener("click", function() {
+
+renderAllTransactions();
+
+showPage("transactions");
+
+});
+
+
+// ---------- TODAY ----------
+
+function getToday() {
+
+const today = new Date();
+
+const year = today.getFullYear();
+
+const month =
+String(today.getMonth() + 1).padStart(2, "0");
+
+const day =
+String(today.getDate()).padStart(2, "0");
+
+return `${year}-${month}-${day}`;
+
+}
+
+
+// ---------- SECURITY ----------
+
+function escapeHTML(text) {
+
+return String(text)
+.replace(/&/g, "&amp;")
+.replace(/</g, "&lt;")
+.replace(/>/g, "&gt;")
+.replace(/"/g, "&quot;")
+.replace(/'/g, "&#039;");
+
+}
+
+
+// ---------- START APP ----------
+
+document.getElementById("date").value =
+getToday();
+
+updateDashboard();
+
+renderAllTransactions();

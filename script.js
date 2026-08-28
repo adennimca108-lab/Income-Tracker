@@ -1,20 +1,66 @@
-// ========================================
-// FINANCIAL TRACKER
-// ========================================
+"use strict";
 
 
 // ========================================
-// STORAGE
+// DATA
 // ========================================
 
-let transactions =
-JSON.parse(localStorage.getItem("transactions")) || [];
+let transactions = [];
 
-let savingsGoal =
-JSON.parse(localStorage.getItem("savingsGoal")) || {
+let savingsGoal = {
 name: "",
 target: 0
 };
+
+
+// ========================================
+// LOAD DATA
+// ========================================
+
+function loadData() {
+
+try {
+
+const savedTransactions =
+localStorage.getItem("financialTransactions");
+
+if (savedTransactions) {
+
+const parsed =
+JSON.parse(savedTransactions);
+
+if (Array.isArray(parsed)) {
+
+transactions = parsed;
+
+}
+
+}
+
+
+const savedGoal =
+localStorage.getItem("financialSavingsGoal");
+
+if (savedGoal) {
+
+const parsedGoal =
+JSON.parse(savedGoal);
+
+if (parsedGoal) {
+
+savingsGoal = parsedGoal;
+
+}
+
+}
+
+} catch (error) {
+
+console.error("Could not load data:", error);
+
+}
+
+}
 
 
 // ========================================
@@ -24,17 +70,17 @@ target: 0
 function saveTransactions() {
 
 localStorage.setItem(
-"transactions",
+"financialTransactions",
 JSON.stringify(transactions)
 );
 
 }
 
 
-function saveSavingsGoal() {
+function saveGoal() {
 
 localStorage.setItem(
-"savingsGoal",
+"financialSavingsGoal",
 JSON.stringify(savingsGoal)
 );
 
@@ -42,52 +88,132 @@ JSON.stringify(savingsGoal)
 
 
 // ========================================
-// PAGE NAVIGATION
+// MONEY
 // ========================================
+
+function formatMoney(amount) {
+
+return new Intl.NumberFormat(
+"en-US",
+{
+style: "currency",
+currency: "USD"
+}
+).format(Number(amount) || 0);
+
+}
+
+
+// ========================================
+// NAVIGATION
+// ========================================
+
+function setupNavigation() {
+
+const buttons =
+document.querySelectorAll(".nav-btn");
+
+
+buttons.forEach(function(button) {
+
+button.addEventListener("click", function() {
+
+const sectionId =
+button.dataset.section;
+
+showSection(sectionId);
+
+});
+
+});
+
+
+const goalButton =
+document.getElementById(
+"dashboardGoalButton"
+);
+
+
+if (goalButton) {
+
+goalButton.addEventListener(
+"click",
+function() {
+
+showSection("goals");
+
+}
+);
+
+}
+
+
+const viewAllButton =
+document.getElementById(
+"viewAllButton"
+);
+
+
+if (viewAllButton) {
+
+viewAllButton.addEventListener(
+"click",
+function() {
+
+showSection("transactions");
+
+}
+);
+
+}
+
+}
+
 
 function showSection(sectionId) {
 
-document.querySelectorAll(".section").forEach(function(section) {
+document
+.querySelectorAll(".section")
+.forEach(function(section) {
 
 section.classList.remove("active");
 
 });
 
 
-const selectedSection =
+const selected =
 document.getElementById(sectionId);
 
 
-if (selectedSection) {
+if (!selected) {
 
-selectedSection.classList.add("active");
+return;
 
 }
 
 
-document.querySelectorAll(".nav-btn").forEach(function(button) {
+selected.classList.add("active");
+
+
+document
+.querySelectorAll(".nav-btn")
+.forEach(function(button) {
 
 button.classList.remove("active");
 
 });
 
 
-const buttons =
-document.querySelectorAll(".nav-btn");
+const activeButton =
+document.querySelector(
+`.nav-btn[data-section="${sectionId}"]`
+);
 
 
-if (sectionId === "dashboard" && buttons[0]) {
-buttons[0].classList.add("active");
-}
+if (activeButton) {
 
+activeButton.classList.add("active");
 
-if (sectionId === "transactions" && buttons[1]) {
-buttons[1].classList.add("active");
-}
-
-
-if (sectionId === "goals" && buttons[2]) {
-buttons[2].classList.add("active");
 }
 
 
@@ -100,140 +226,88 @@ behavior: "smooth"
 
 
 // ========================================
-// FORMAT MONEY
+// TOTALS
 // ========================================
 
-function formatMoney(amount) {
+function getIncome() {
 
-return new Intl.NumberFormat("en-US", {
+return transactions.reduce(
+function(total, transaction) {
 
-style: "currency",
-
-currency: "USD"
-
-}).format(Number(amount) || 0);
-
-}
-
-
-// ========================================
-// PROTECT TEXT
-// ========================================
-
-function escapeHTML(value) {
-
-return String(value)
-
-.replace(/&/g, "&amp;")
-
-.replace(/</g, "&lt;")
-
-.replace(/>/g, "&gt;")
-
-.replace(/"/g, "&quot;")
-
-.replace(/'/g, "&#039;");
-
-}
-
-
-// ========================================
-// CALCULATE TOTALS
-// ========================================
-
-function getTotalIncome() {
-
-return transactions
-
-.filter(function(transaction) {
-
-return transaction.type === "income";
-
-})
-
-.reduce(function(total, transaction) {
+if (transaction.type === "income") {
 
 return total + Number(transaction.amount);
 
-}, 0);
+}
+
+return total;
+
+},
+0
+);
 
 }
 
 
-function getTotalExpenses() {
+function getExpenses() {
 
-return transactions
+return transactions.reduce(
+function(total, transaction) {
 
-.filter(function(transaction) {
-
-return transaction.type === "expense";
-
-})
-
-.reduce(function(total, transaction) {
+if (transaction.type === "expense") {
 
 return total + Number(transaction.amount);
 
-}, 0);
+}
+
+return total;
+
+},
+0
+);
 
 }
 
 
 function getBalance() {
 
-return getTotalIncome() - getTotalExpenses();
+return getIncome() - getExpenses();
 
 }
 
 
 // ========================================
-// UPDATE DASHBOARD
+// DASHBOARD
 // ========================================
 
 function updateDashboard() {
 
 const income =
-getTotalIncome();
+getIncome();
 
 const expenses =
-getTotalExpenses();
+getExpenses();
 
 const balance =
 getBalance();
 
 
-const incomeElement =
-document.getElementById("totalIncome");
-
-const expenseElement =
-document.getElementById("totalExpenses");
-
-const balanceElement =
-document.getElementById("balance");
-
-
-if (incomeElement) {
-
-incomeElement.textContent =
+document.getElementById(
+"totalIncome"
+).textContent =
 formatMoney(income);
 
-}
 
-
-if (expenseElement) {
-
-expenseElement.textContent =
+document.getElementById(
+"totalExpenses"
+).textContent =
 formatMoney(expenses);
 
-}
 
-
-if (balanceElement) {
-
-balanceElement.textContent =
+document.getElementById(
+"balance"
+).textContent =
 formatMoney(balance);
-
-}
 
 }
 
@@ -242,46 +316,77 @@ formatMoney(balance);
 // ADD TRANSACTION
 // ========================================
 
+function setupTransactionForm() {
+
+const button =
+document.getElementById(
+"addTransactionButton"
+);
+
+
+button.addEventListener(
+"click",
+addTransaction
+);
+
+}
+
+
 function addTransaction() {
 
-const nameElement =
-document.getElementById("transactionName");
+const nameInput =
+document.getElementById(
+"transactionName"
+);
 
-const amountElement =
-document.getElementById("transactionAmount");
+const amountInput =
+document.getElementById(
+"transactionAmount"
+);
 
-const typeElement =
-document.getElementById("transactionType");
+const typeInput =
+document.getElementById(
+"transactionType"
+);
 
-const categoryElement =
-document.getElementById("transactionCategory");
+const categoryInput =
+document.getElementById(
+"transactionCategory"
+);
 
 
 const name =
-nameElement.value.trim();
+nameInput.value.trim();
 
 const amount =
-Number(amountElement.value);
+Number(amountInput.value);
 
 const type =
-typeElement.value;
+typeInput.value;
 
 const category =
-categoryElement.value;
+categoryInput.value;
 
 
-if (name === "") {
+if (!name) {
 
-alert("Please enter a transaction name.");
+alert(
+"Please enter a transaction name."
+);
 
 return;
 
 }
 
 
-if (!amount || amount <= 0) {
+if (
+!Number.isFinite(amount) ||
+amount <= 0
+) {
 
-alert("Please enter a valid amount.");
+alert(
+"Please enter a valid amount."
+);
 
 return;
 
@@ -290,7 +395,11 @@ return;
 
 const transaction = {
 
-id: Date.now(),
+id:
+Date.now().toString() +
+Math.random()
+.toString(36)
+.substring(2, 8),
 
 name: name,
 
@@ -300,15 +409,15 @@ type: type,
 
 category: category,
 
-date: new Date().toLocaleDateString("en-US", {
-
+date:
+new Date().toLocaleDateString(
+"en-US",
+{
 month: "short",
-
 day: "numeric",
-
 year: "numeric"
-
-})
+}
+)
 
 };
 
@@ -319,15 +428,17 @@ transactions.unshift(transaction);
 saveTransactions();
 
 
-nameElement.value = "";
+nameInput.value = "";
 
-amountElement.value = "";
+amountInput.value = "";
 
 
 updateApp();
 
 
-alert("Transaction added successfully! 💰");
+alert(
+"Transaction added successfully! 💰"
+);
 
 }
 
@@ -338,26 +449,27 @@ alert("Transaction added successfully! 💰");
 
 function deleteTransaction(id) {
 
-// Find ONLY the transaction that was clicked
 const transaction =
 transactions.find(function(item) {
 
-return Number(item.id) === Number(id);
+return String(item.id) === String(id);
 
 });
 
 
-// If it doesn't exist, stop
 if (!transaction) {
+
+alert(
+"Transaction could not be found."
+);
 
 return;
 
 }
 
 
-// Ask before deleting
 const confirmed =
-confirm(
+window.confirm(
 `Delete "${transaction.name}"?`
 );
 
@@ -369,30 +481,21 @@ return;
 }
 
 
-// IMPORTANT:
-// Remove ONLY the selected transaction.
-// Every other transaction stays.
+// THIS REMOVES ONLY THE SELECTED ITEM.
 transactions =
 transactions.filter(function(item) {
 
-return Number(item.id) !== Number(id);
+return String(item.id) !== String(id);
 
 });
 
 
-// Save the remaining transactions
 saveTransactions();
 
 
-// Refresh everything
 updateApp();
 
 }
-
-
-// Make the function available to HTML buttons
-window.deleteTransaction =
-deleteTransaction;
 
 
 // ========================================
@@ -401,30 +504,27 @@ deleteTransaction;
 
 function displayTransactions() {
 
-const allContainer =
-document.getElementById("allTransactions");
+const all =
+document.getElementById(
+"allTransactions"
+);
 
-const recentContainer =
-document.getElementById("recentTransactions");
-
-
-if (!allContainer || !recentContainer) {
-
-return;
-
-}
+const recent =
+document.getElementById(
+"recentTransactions"
+);
 
 
 if (transactions.length === 0) {
 
-allContainer.innerHTML = `
+all.innerHTML = `
 <div class="empty">
 No transactions yet.
 </div>
 `;
 
 
-recentContainer.innerHTML = `
+recent.innerHTML = `
 <div class="empty">
 No transactions yet.
 </div>
@@ -436,12 +536,11 @@ return;
 }
 
 
-// ALL TRANSACTIONS
-allContainer.innerHTML =
+all.innerHTML =
 transactions
 .map(function(transaction) {
 
-return createTransactionHTML(
+return transactionHTML(
 transaction,
 true
 );
@@ -450,13 +549,12 @@ true
 .join("");
 
 
-// RECENT TRANSACTIONS
-recentContainer.innerHTML =
+recent.innerHTML =
 transactions
 .slice(0, 5)
 .map(function(transaction) {
 
-return createTransactionHTML(
+return transactionHTML(
 transaction,
 false
 );
@@ -464,36 +562,58 @@ false
 })
 .join("");
 
+
+// Add Delete listeners AFTER
+// creating the buttons.
+
+all
+.querySelectorAll(".delete-btn")
+.forEach(function(button) {
+
+button.addEventListener(
+"click",
+function() {
+
+const id =
+button.dataset.id;
+
+deleteTransaction(id);
+
+}
+);
+
+});
+
 }
 
 
 // ========================================
-// CREATE TRANSACTION HTML
+// TRANSACTION HTML
 // ========================================
 
-function createTransactionHTML(
+function transactionHTML(
 transaction,
 showDelete
 ) {
 
-const isIncome =
+const income =
 transaction.type === "income";
 
 
 const icon =
-isIncome ? "📈" : "📉";
+income ? "📈" : "📉";
 
 
 const sign =
-isIncome ? "+" : "-";
+income ? "+" : "-";
 
 
 const amountClass =
-isIncome ? "income" : "expense";
+income ? "income" : "expense";
 
 
 const iconClass =
-isIncome
+income
 ? "income-icon"
 : "expense-icon";
 
@@ -507,7 +627,8 @@ deleteButton = `
 
 <button
 class="delete-btn"
-onclick="deleteTransaction(${transaction.id})">
+data-id="${escapeHTML(transaction.id)}"
+type="button">
 
 Delete
 
@@ -538,18 +659,24 @@ ${icon}
 
 <div class="transaction-name">
 
-${escapeHTML(transaction.name)}
+${escapeHTML(
+transaction.name
+)}
 
 </div>
 
 
 <div class="transaction-meta">
 
-${escapeHTML(transaction.category)}
+${escapeHTML(
+transaction.category
+)}
 
 •
 
-${escapeHTML(transaction.date)}
+${escapeHTML(
+transaction.date
+)}
 
 </div>
 
@@ -558,15 +685,15 @@ ${escapeHTML(transaction.date)}
 </div>
 
 
-<div
-class="
+<div class="
 transaction-amount
 ${amountClass}
-"
->
+">
 
 ${sign}
-${formatMoney(transaction.amount)}
+${formatMoney(
+transaction.amount
+)}
 
 </div>
 
@@ -584,34 +711,72 @@ ${deleteButton}
 // SAVINGS GOAL
 // ========================================
 
-function saveGoal() {
+function setupGoalForm() {
 
-const nameElement =
-document.getElementById("goalInputName");
+const saveButton =
+document.getElementById(
+"saveGoalButton"
+);
 
-const amountElement =
-document.getElementById("goalInputAmount");
 
+const deleteButton =
+document.getElementById(
+"deleteGoalButton"
+);
+
+
+saveButton.addEventListener(
+"click",
+saveSavingsGoal
+);
+
+
+deleteButton.addEventListener(
+"click",
+deleteSavingsGoal
+);
+
+}
+
+
+function saveSavingsGoal() {
 
 const name =
-nameElement.value.trim();
+document
+.getElementById(
+"goalInputName"
+)
+.value
+.trim();
+
 
 const target =
-Number(amountElement.value);
+Number(
+document.getElementById(
+"goalInputAmount"
+).value
+);
 
 
-if (name === "") {
+if (!name) {
 
-alert("Please enter a goal name.");
+alert(
+"Please enter a goal name."
+);
 
 return;
 
 }
 
 
-if (!target || target <= 0) {
+if (
+!Number.isFinite(target) ||
+target <= 0
+) {
 
-alert("Please enter a valid target amount.");
+alert(
+"Please enter a valid target amount."
+);
 
 return;
 
@@ -627,31 +792,36 @@ target: target
 };
 
 
-saveSavingsGoal();
+saveGoal();
 
 
-nameElement.value = "";
+document.getElementById(
+"goalInputName"
+).value = "";
 
-amountElement.value = "";
+
+document.getElementById(
+"goalInputAmount"
+).value = "";
 
 
 updateApp();
 
 
-alert("Savings goal saved! 🎯");
+alert(
+"Savings goal saved! 🎯"
+);
 
 }
 
 
-// ========================================
-// DELETE SAVINGS GOAL
-// ========================================
-
-function deleteGoal() {
+function deleteSavingsGoal() {
 
 if (!savingsGoal.name) {
 
-alert("You don't have a savings goal.");
+alert(
+"There is no savings goal."
+);
 
 return;
 
@@ -659,7 +829,9 @@ return;
 
 
 const confirmed =
-confirm("Delete your savings goal?");
+window.confirm(
+"Delete your savings goal?"
+);
 
 
 if (!confirmed) {
@@ -678,7 +850,7 @@ target: 0
 };
 
 
-saveSavingsGoal();
+saveGoal();
 
 
 updateApp();
@@ -687,17 +859,19 @@ updateApp();
 
 
 // ========================================
-// UPDATE SAVINGS GOAL DISPLAY
+// UPDATE GOAL
 // ========================================
 
 function updateGoal() {
 
-const saved =
-Math.max(getBalance(), 0);
-
-
 const target =
 Number(savingsGoal.target) || 0;
+
+
+// Balance is used as the current
+// amount available toward the goal.
+const saved =
+Math.max(getBalance(), 0);
 
 
 let percentage = 0;
@@ -713,83 +887,51 @@ Math.round(
 }
 
 
-if (percentage > 100) {
+percentage =
+Math.min(
+Math.max(percentage, 0),
+100
+);
 
-percentage = 100;
 
-}
-
-
-const goalName =
+document.getElementById(
+"goalName"
+).textContent =
 savingsGoal.name ||
 "No savings goal yet";
 
 
-const goalNameElement =
-document.getElementById("goalName");
-
-
-const goalPercentElement =
-document.getElementById("goalPercent");
-
-
-const progressElement =
-document.getElementById("goalProgress");
-
-
-const savedElement =
-document.getElementById("savedAmount");
-
-
-const targetElement =
-document.getElementById("targetAmount");
-
-
-if (goalNameElement) {
-
-goalNameElement.textContent =
-goalName;
-
-}
-
-
-if (goalPercentElement) {
-
-goalPercentElement.textContent =
+document.getElementById(
+"goalPercent"
+).textContent =
 percentage + "%";
 
-}
 
-
-if (progressElement) {
-
-progressElement.style.width =
+document.getElementById(
+"goalProgress"
+).style.width =
 percentage + "%";
 
-}
+
+document.getElementById(
+"savedAmount"
+).textContent =
+formatMoney(saved) +
+" saved";
 
 
-if (savedElement) {
-
-savedElement.textContent =
-formatMoney(saved) + " saved";
-
-}
-
-
-if (targetElement) {
-
-targetElement.textContent =
-"Goal: " + formatMoney(target);
-
-}
+document.getElementById(
+"targetAmount"
+).textContent =
+"Goal: " +
+formatMoney(target);
 
 
 const currentGoal =
-document.getElementById("currentGoal");
+document.getElementById(
+"currentGoal"
+);
 
-
-if (currentGoal) {
 
 if (!savingsGoal.name) {
 
@@ -797,21 +939,27 @@ currentGoal.innerHTML = `
 
 <div class="empty">
 
-No savings goal has been created yet.
+No savings goal has been
+created yet.
 
 </div>
 
 `;
 
-} else {
+return;
+
+}
+
 
 currentGoal.innerHTML = `
 
 <h2>
-${escapeHTML(savingsGoal.name)}
+${escapeHTML(
+savingsGoal.name
+)}
 </h2>
 
-<p style="margin:15px 0;">
+<p style="margin:15px 0;color:#728391;">
 
 ${formatMoney(saved)}
 saved out of
@@ -838,13 +986,30 @@ ${percentage}% complete
 
 }
 
-}
+
+// ========================================
+// ESCAPE HTML
+// ========================================
+
+function escapeHTML(value) {
+
+return String(value)
+
+.replace(/&/g, "&amp;")
+
+.replace(/</g, "&lt;")
+
+.replace(/>/g, "&gt;")
+
+.replace(/"/g, "&quot;")
+
+.replace(/'/g, "&#039;");
 
 }
 
 
 // ========================================
-// UPDATE ENTIRE APP
+// UPDATE EVERYTHING
 // ========================================
 
 function updateApp() {
@@ -859,12 +1024,20 @@ displayTransactions();
 
 
 // ========================================
-// START APP
+// START
 // ========================================
 
 document.addEventListener(
 "DOMContentLoaded",
 function() {
+
+loadData();
+
+setupNavigation();
+
+setupTransactionForm();
+
+setupGoalForm();
 
 updateApp();
 

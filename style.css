@@ -1,277 +1,565 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#173247">
-<title>Financial Tracker</title>
-
-<link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
-<header>
-<div class="brand">
-<div class="logo">💰</div>
-<div>
-<h1>Financial Tracker</h1>
-<p>Take control of your money</p>
-</div>
-</div>
-
-<nav>
-<button class="nav-btn active" data-page="dashboard">Dashboard</button>
-<button class="nav-btn" data-page="transactions">Transactions</button>
-<button class="nav-btn" data-page="savings">Savings Goals</button>
-</nav>
-</header>
-
-
-<main>
-
-<!-- DASHBOARD -->
-<section id="dashboard" class="page active-page">
-
-<h2>Dashboard</h2>
-<p class="subtitle">Your financial overview</p>
-
-<div class="summary-grid">
-
-<div class="summary-card">
-<span class="card-icon">💵</span>
-<p>Balance</p>
-<h3 id="balance">$0.00</h3>
-</div>
-
-<div class="summary-card">
-<span class="card-icon">📈</span>
-<p>Income</p>
-<h3 id="income">$0.00</h3>
-</div>
-
-<div class="summary-card">
-<span class="card-icon">📉</span>
-<p>Expenses</p>
-<h3 id="expenses">$0.00</h3>
-</div>
-
-</div>
-
-
-<!-- SAVINGS GOAL -->
-<div class="card savings-card">
-
-<div class="section-heading">
-<div>
-<h2>Savings Goal</h2>
-<p>Track your progress</p>
-</div>
-
-<strong id="goalPercent">0%</strong>
-</div>
-
-<h3 id="goalName">Set your savings goal</h3>
-
-<div class="progress-bar">
-<div id="goalProgress"></div>
-</div>
-
-<div class="goal-info">
-<strong id="savedAmount">$0.00 saved</strong>
-<span id="goalAmount">Goal: $1,000.00</span>
-</div>
-
-<button id="setGoalBtn" class="primary-btn">
-Set Savings Goal
-</button>
-
-</div>
-
-
-<!-- RECENT TRANSACTIONS -->
-<div class="card">
-
-<div class="section-heading">
-<div>
-<h2>Recent Transactions</h2>
-<p>Your latest financial activity</p>
-</div>
-
-<button id="viewAllBtn" class="text-btn">
-View All
-</button>
-</div>
-
-<div id="recentTransactions"></div>
-
-</div>
-
-</section>
-
-
-<!-- TRANSACTIONS -->
-<section id="transactions" class="page">
-
-<h2>Transactions</h2>
-<p class="subtitle">Manage your income and expenses</p>
-
-<div class="card">
-
-<h2>Add Transaction</h2>
-
-<form id="transactionForm">
-
-<label for="description">Description</label>
-<input
-type="text"
-id="description"
-placeholder="e.g. Groceries"
-required
->
-
-<label for="amount">Amount</label>
-<input
-type="number"
-id="amount"
-placeholder="0.00"
-step="0.01"
-min="0"
-required
->
-
-<label for="type">Type</label>
-<select id="type">
-<option value="expense">Expense</option>
-<option value="income">Income</option>
-</select>
-
-<label for="category">Category</label>
-<select id="category">
-<option value="Other">Other</option>
-<option value="Food">Food</option>
-<option value="Salary">Salary</option>
-<option value="Housing">Housing</option>
-<option value="Transportation">Transportation</option>
-<option value="Entertainment">Entertainment</option>
-<option value="Shopping">Shopping</option>
-<option value="Bills">Bills</option>
-<option value="Savings">Savings</option>
-</select>
-
-<label for="date">Date</label>
-<input type="date" id="date" required>
-
-<button type="submit" class="primary-btn">
-Add Transaction
-</button>
-
-</form>
-
-</div>
-
-
-<div class="card">
-
-<div class="section-heading">
-<div>
-<h2>All Transactions</h2>
-<p>View and remove transactions</p>
-</div>
-</div>
-
-<div id="allTransactions"></div>
-
-</div>
-
-</section>
-
-
-<!-- SAVINGS -->
-<section id="savings" class="page">
-
-<h2>Savings Goals</h2>
-<p class="subtitle">Build your savings</p>
-
-<div class="card">
-
-<h2>Current Goal</h2>
-
-<div class="big-goal">
-<div class="goal-circle">
-<span id="savingsPercent">0%</span>
-</div>
-
-<div>
-<h3 id="savingsGoalName">Save every paycheck</h3>
-<p id="savingsGoalDetails">
-Set a goal and start saving.
-</p>
-</div>
-</div>
-
-<div class="progress-bar">
-<div id="savingsProgress"></div>
-</div>
-
-<div class="goal-info">
-<strong id="savingsSaved">$0.00 saved</strong>
-<span id="savingsTarget">Target: $1,000.00</span>
-</div>
-
-<button id="changeGoalBtn" class="primary-btn">
-Set / Change Goal
-</button>
-
-</div>
-
-</section>
-
-</main>
-
-
-<footer>
-<p>© 2026 Financial Tracker</p>
-<p>Save smart. Spend wisely. 💰</p>
-</footer>
-
-
-<!-- GOAL MODAL -->
-<div id="goalModal" class="modal">
-
-<div class="modal-content">
-
-<button id="closeModal" class="close-btn">&times;</button>
-
-<h2>Set Savings Goal</h2>
-<p>Choose what you want to save for.</p>
-
-<label for="goalTitle">Goal name</label>
-<input
-type="text"
-id="goalTitle"
-placeholder="e.g. New car"
->
-
-<label for="goalTarget">Target amount</label>
-<input
-type="number"
-id="goalTarget"
-min="1"
-step="0.01"
-placeholder="1000"
->
-
-<button id="saveGoalBtn" class="primary-btn">
-Save Goal
-</button>
-
-</div>
-
-</div>
-
-
-<script src="script.js"></script>
-
-</body>
-</html>
+* {
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+}
+
+body {
+font-family: Arial, Helvetica, sans-serif;
+background: #f2f7f8;
+color: #263746;
+min-height: 100vh;
+}
+
+
+/* ================= HEADER ================= */
+
+.header {
+background: #173044;
+color: white;
+padding: 35px 6%;
+box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+}
+
+.brand {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 20px;
+}
+
+.logo {
+width: 80px;
+height: 80px;
+border-radius: 22px;
+background: #16a085;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 42px;
+}
+
+.brand h1 {
+font-size: 38px;
+margin-bottom: 5px;
+}
+
+.brand p {
+color: #aebdca;
+font-size: 18px;
+}
+
+
+nav {
+display: flex;
+justify-content: center;
+gap: 15px;
+margin-top: 35px;
+flex-wrap: wrap;
+}
+
+.nav-btn {
+border: none;
+background: transparent;
+color: white;
+padding: 15px 25px;
+border-radius: 12px;
+font-size: 18px;
+font-weight: bold;
+cursor: pointer;
+transition: 0.2s;
+}
+
+.nav-btn:hover {
+background: rgba(255,255,255,0.12);
+}
+
+.nav-btn.active {
+background: #16a085;
+}
+
+
+/* ================= MAIN ================= */
+
+main {
+width: 90%;
+max-width: 1100px;
+margin: 45px auto;
+}
+
+.page {
+display: none;
+}
+
+.active-page {
+display: block;
+}
+
+.page-title {
+margin-bottom: 30px;
+}
+
+.page-title h2 {
+font-size: 38px;
+margin-bottom: 8px;
+}
+
+.page-title p {
+color: #71808c;
+font-size: 19px;
+}
+
+
+/* ================= SUMMARY ================= */
+
+.summary-grid {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 22px;
+margin-bottom: 25px;
+}
+
+.summary-card {
+background: white;
+border-radius: 22px;
+padding: 30px;
+text-align: center;
+box-shadow: 0 5px 20px rgba(30,60,70,0.08);
+}
+
+.summary-card span {
+font-size: 30px;
+}
+
+.summary-card h3 {
+margin: 12px 0;
+color: #71808c;
+}
+
+.summary-card strong {
+font-size: 30px;
+color: #16a085;
+}
+
+
+/* ================= CARDS ================= */
+
+.card {
+background: white;
+border-radius: 25px;
+padding: 32px;
+margin-bottom: 25px;
+box-shadow: 0 5px 20px rgba(30,60,70,0.08);
+}
+
+.card h2 {
+margin-bottom: 8px;
+}
+
+.card p {
+color: #71808c;
+}
+
+.card-heading {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 20px;
+margin-bottom: 25px;
+}
+
+.card-heading > strong {
+font-size: 30px;
+}
+
+
+/* ================= SAVINGS ================= */
+
+.savings-card h3 {
+font-size: 28px;
+margin-bottom: 20px;
+}
+
+.progress-container {
+height: 22px;
+background: #e2ebef;
+border-radius: 30px;
+overflow: hidden;
+margin: 20px 0;
+}
+
+.progress-container.large {
+height: 28px;
+}
+
+.progress-bar {
+height: 100%;
+width: 0%;
+background: #16a085;
+border-radius: 30px;
+transition: width 0.5s ease;
+}
+
+.goal-info {
+display: flex;
+justify-content: space-between;
+gap: 20px;
+margin-bottom: 25px;
+font-size: 18px;
+}
+
+.goal-info strong {
+color: #16a085;
+}
+
+.goal-info span {
+color: #71808c;
+}
+
+
+/* ================= BUTTONS ================= */
+
+button {
+font-family: inherit;
+}
+
+.primary-button {
+border: none;
+background: #16a085;
+color: white;
+padding: 15px 25px;
+border-radius: 12px;
+font-size: 17px;
+font-weight: bold;
+cursor: pointer;
+transition: 0.2s;
+}
+
+.primary-button:hover {
+background: #12876f;
+transform: translateY(-1px);
+}
+
+.text-button {
+border: none;
+background: transparent;
+color: #16a085;
+font-size: 17px;
+font-weight: bold;
+cursor: pointer;
+}
+
+.danger-button {
+border: none;
+background: #e85d5d;
+color: white;
+padding: 12px 18px;
+border-radius: 10px;
+font-weight: bold;
+cursor: pointer;
+}
+
+.danger-button:hover {
+background: #cc4545;
+}
+
+
+/* ================= FORMS ================= */
+
+.form-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 20px;
+margin: 25px 0;
+}
+
+.form-group {
+margin-bottom: 22px;
+}
+
+.form-group label {
+display: block;
+margin-bottom: 9px;
+font-size: 17px;
+font-weight: bold;
+}
+
+input,
+select {
+width: 100%;
+padding: 16px;
+border: 2px solid #dce6ea;
+border-radius: 12px;
+font-size: 17px;
+background: white;
+color: #263746;
+outline: none;
+}
+
+input:focus,
+select:focus {
+border-color: #16a085;
+}
+
+
+/* ================= TRANSACTIONS ================= */
+
+.transaction-list {
+margin-top: 10px;
+}
+
+.transaction {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 20px;
+padding: 20px 0;
+border-bottom: 1px solid #e2e8eb;
+}
+
+.transaction:last-child {
+border-bottom: none;
+}
+
+.transaction-left {
+display: flex;
+align-items: center;
+gap: 15px;
+min-width: 0;
+}
+
+.transaction-icon {
+width: 55px;
+height: 55px;
+border-radius: 16px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 25px;
+flex-shrink: 0;
+}
+
+.income-icon {
+background: #d9f5ed;
+}
+
+.expense-icon {
+background: #ffe1e1;
+}
+
+.transaction-info h3 {
+margin-bottom: 5px;
+}
+
+.transaction-info p {
+color: #71808c;
+}
+
+.transaction-right {
+display: flex;
+align-items: center;
+gap: 15px;
+}
+
+.income-amount {
+color: #16a085;
+font-size: 20px;
+font-weight: bold;
+}
+
+.expense-amount {
+color: #e85d5d;
+font-size: 20px;
+font-weight: bold;
+}
+
+.delete-button {
+border: none;
+background: #ffe1e1;
+color: #d94747;
+width: 38px;
+height: 38px;
+border-radius: 10px;
+cursor: pointer;
+font-size: 18px;
+}
+
+.delete-button:hover {
+background: #ffd0d0;
+}
+
+.empty {
+text-align: center;
+padding: 35px 10px;
+color: #71808c;
+}
+
+
+/* ================= MODAL ================= */
+
+.modal {
+position: fixed;
+inset: 0;
+background: rgba(20, 35, 45, 0.72);
+
+display: none;
+
+align-items: center;
+justify-content: center;
+
+padding: 20px;
+
+z-index: 9999;
+}
+
+.modal.show {
+display: flex;
+}
+
+.modal-content {
+width: 100%;
+max-width: 520px;
+background: white;
+border-radius: 25px;
+padding: 35px;
+position: relative;
+box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.modal-content h2 {
+font-size: 30px;
+margin-bottom: 8px;
+}
+
+.modal-content > p {
+color: #71808c;
+margin-bottom: 25px;
+}
+
+.close-button {
+position: absolute;
+right: 18px;
+top: 18px;
+
+width: 48px;
+height: 48px;
+
+border: none;
+border-radius: 50%;
+
+background: #f1f5f6;
+color: #263746;
+
+font-size: 30px;
+cursor: pointer;
+}
+
+.close-button:hover {
+background: #e2eaed;
+}
+
+
+/* ================= FOOTER ================= */
+
+footer {
+background: #173044;
+color: white;
+text-align: center;
+padding: 30px;
+margin-top: 60px;
+}
+
+footer p {
+margin: 5px;
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 750px) {
+
+.header {
+padding: 25px 18px;
+}
+
+.brand {
+justify-content: flex-start;
+}
+
+.logo {
+width: 65px;
+height: 65px;
+font-size: 32px;
+}
+
+.brand h1 {
+font-size: 27px;
+}
+
+.brand p {
+font-size: 15px;
+}
+
+nav {
+gap: 5px;
+margin-top: 25px;
+}
+
+.nav-btn {
+padding: 12px 14px;
+font-size: 15px;
+}
+
+main {
+width: 94%;
+margin: 30px auto;
+}
+
+.page-title h2 {
+font-size: 30px;
+}
+
+.summary-grid {
+grid-template-columns: 1fr;
+}
+
+.form-grid {
+grid-template-columns: 1fr;
+gap: 0;
+}
+
+.card {
+padding: 22px;
+border-radius: 20px;
+}
+
+.card-heading {
+align-items: flex-start;
+}
+
+.transaction {
+align-items: flex-start;
+}
+
+.transaction-right {
+flex-direction: column;
+align-items: flex-end;
+gap: 8px;
+}
+
+.transaction-info h3 {
+font-size: 17px;
+}
+
+.transaction-info p {
+font-size: 14px;
+}
+
+.goal-info {
+font-size: 15px;
+}
+
+.modal-content {
+padding: 28px 22px;
+}
+}

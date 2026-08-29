@@ -1,61 +1,157 @@
-// ================================
-// FINANCIAL TRACKER
-// ================================
+// ============================================================
+// FINANCIAL TRACKER - SUPABASE VERSION
+// ============================================================
 
-// Get saved data
-let transactions = JSON.parse(
-localStorage.getItem("financialTransactions")
-) || [];
+// ------------------------------------------------------------
+// SUPABASE SETTINGS
+// ------------------------------------------------------------
 
-let savingsGoal = JSON.parse(
-localStorage.getItem("financialSavingsGoal")
-) || {
+const SUPABASE_URL = "https://stzeslietxwblleglsob.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_GO4GdQMXfo61c8cS-oFr-g_Ka4-pRsC";
+
+const TRANSACTIONS_URL =
+SUPABASE_URL + "/rest/v1/transactions";
+
+const GOALS_URL =
+SUPABASE_URL + "/rest/v1/savings_goals";
+
+
+// ------------------------------------------------------------
+// SUPABASE REQUEST HELPER
+// ------------------------------------------------------------
+
+async function supabaseRequest(url, options = {}) {
+
+const response = await fetch(url, {
+
+...options,
+
+headers: {
+
+"apikey": SUPABASE_KEY,
+
+"Authorization": "Bearer " + SUPABASE_KEY,
+
+"Content-Type": "application/json",
+
+"Prefer": options.method === "POST"
+? "return=representation"
+: options.method === "PATCH"
+? "return=representation"
+: options.method === "DELETE"
+? "return=representation"
+: "return=representation",
+
+...(options.headers || {})
+}
+
+});
+
+
+if (!response.ok) {
+
+const errorText = await response.text();
+
+console.error("Supabase error:", errorText);
+
+throw new Error(errorText || "Supabase request failed");
+}
+
+
+const text = await response.text();
+
+if (!text) {
+return null;
+}
+
+
+try {
+
+return JSON.parse(text);
+
+} catch {
+
+return text;
+
+}
+
+}
+
+
+// ============================================================
+// APP DATA
+// ============================================================
+
+let transactions = [];
+
+let savingsGoal = {
 name: "",
 amount: 0
 };
 
 
-// ================================
+// ============================================================
 // PAGE NAVIGATION
-// ================================
+// ============================================================
 
 function showPage(pageName) {
 
 document.querySelectorAll(".page").forEach(function(page) {
+
 page.classList.remove("active-page");
+
 });
 
-const selectedPage = document.getElementById(pageName);
+
+const selectedPage =
+document.getElementById(pageName);
+
 
 if (selectedPage) {
+
 selectedPage.classList.add("active-page");
+
 }
 
+
 document.querySelectorAll(".nav-btn").forEach(function(button) {
+
 button.classList.remove("active");
+
 });
 
-const activeButton = document.querySelector(
+
+const activeButton =
+document.querySelector(
 '.nav-btn[data-page="' + pageName + '"]'
 );
 
+
 if (activeButton) {
+
 activeButton.classList.add("active");
+
 }
+
 
 window.scrollTo({
 top: 0,
 behavior: "smooth"
 });
+
 }
 
 
 // Make navigation buttons work
+
 document.querySelectorAll(".nav-btn").forEach(function(button) {
 
 button.addEventListener("click", function() {
 
-const page = button.getAttribute("data-page");
+const page =
+button.getAttribute("data-page");
 
 showPage(page);
 
@@ -64,55 +160,160 @@ showPage(page);
 });
 
 
-// ================================
-// SAVE TRANSACTIONS
-// ================================
+// ============================================================
+// LOAD TRANSACTIONS FROM SUPABASE
+// ============================================================
 
-function saveTransactions() {
+async function loadTransactions() {
 
-localStorage.setItem(
-"financialTransactions",
-JSON.stringify(transactions)
+try {
+
+const data = await supabaseRequest(
+
+TRANSACTIONS_URL +
+"?select=*&order=id.desc"
+
+);
+
+
+if (Array.isArray(data)) {
+
+transactions = data;
+
+} else {
+
+transactions = [];
+
+}
+
+
+updateApp();
+
+} catch (error) {
+
+console.error(error);
+
+alert(
+"Could not load transactions from Supabase.\n\n" +
+"Please check your Supabase table and permissions."
 );
 
 }
 
+}
 
-// ================================
+
+// ============================================================
+// LOAD SAVINGS GOAL FROM SUPABASE
+// ============================================================
+
+async function loadSavingsGoal() {
+
+try {
+
+const data = await supabaseRequest(
+
+GOALS_URL +
+"?select=*&order=id.desc&limit=1"
+
+);
+
+
+if (Array.isArray(data) && data.length > 0) {
+
+savingsGoal = {
+
+name: data[0].name || "",
+
+amount: Number(data[0].amount) || 0
+
+};
+
+} else {
+
+savingsGoal = {
+name: "",
+amount: 0
+};
+
+}
+
+
+updateGoalDisplay();
+
+} catch (error) {
+
+console.error(error);
+
+// Don't stop the whole application if goals fail.
+
+}
+
+}
+
+
+// ============================================================
 // ADD TRANSACTION
-// ================================
+// ============================================================
 
-const transactionForm = document.getElementById("transactionForm");
+const transactionForm =
+document.getElementById("transactionForm");
 
-transactionForm.addEventListener("submit", function(event) {
+
+if (transactionForm) {
+
+transactionForm.addEventListener(
+"submit",
+async function(event) {
 
 event.preventDefault();
 
-const type = document.getElementById("transactionType").value;
 
-const name = document.getElementById("transactionName").value.trim();
+const type =
+document.getElementById(
+"transactionType"
+).value;
+
+
+const name =
+document.getElementById(
+"transactionName"
+).value.trim();
+
 
 const category =
-document.getElementById("transactionCategory").value;
+document.getElementById(
+"transactionCategory"
+).value;
+
 
 const amount =
-parseFloat(document.getElementById("transactionAmount").value);
+parseFloat(
+document.getElementById(
+"transactionAmount"
+).value
+);
 
 
 if (!name) {
+
 alert("Please enter a description.");
+
 return;
+
 }
 
+
 if (!amount || amount <= 0) {
+
 alert("Please enter a valid amount.");
+
 return;
+
 }
 
 
 const newTransaction = {
-
-id: Date.now(),
 
 type: type,
 
@@ -122,119 +323,270 @@ category: category,
 
 amount: amount,
 
-date: new Date().toLocaleDateString("en-US", {
+date: new Date().toLocaleDateString(
+"en-US",
+{
 month: "short",
 day: "numeric",
 year: "numeric"
-})
+}
+)
 
 };
 
 
-transactions.unshift(newTransaction);
+try {
 
-saveTransactions();
+const result =
+await supabaseRequest(
+TRANSACTIONS_URL,
+{
+method: "POST",
+body: JSON.stringify(
+newTransaction
+)
+}
+);
+
+
+if (Array.isArray(result) && result.length > 0) {
+
+transactions.unshift(result[0]);
+
+} else {
+
+await loadTransactions();
+
+}
+
 
 transactionForm.reset();
 
 updateApp();
 
-alert("Transaction added successfully!");
+alert(
+"Transaction added successfully!"
+);
 
 
-// Go back to dashboard
 showPage("dashboard");
 
-});
+
+} catch (error) {
+
+console.error(error);
+
+alert(
+"Could not add the transaction.\n\n" +
+error.message
+);
+
+}
+
+}
+);
+
+}
 
 
-// ================================
+// ============================================================
 // DELETE ONE TRANSACTION
-// ================================
+// ============================================================
+//
+// IMPORTANT:
+// This deletes ONLY the transaction whose ID is clicked.
+// It does NOT delete all transactions.
+// ============================================================
 
-function deleteTransaction(id) {
+async function deleteTransaction(id) {
 
-const transaction = transactions.find(function(item) {
+console.log("Deleting transaction ID:", id);
 
-return item.id === id;
+
+const transaction =
+transactions.find(function(item) {
+
+return String(item.id) === String(id);
 
 });
 
 
 if (!transaction) {
+
+alert("Transaction not found.");
+
 return;
+
 }
 
 
-const confirmed = confirm(
+const confirmed =
+confirm(
 'Delete "' +
 transaction.name +
-'" for $' +
-transaction.amount.toFixed(2) +
-'?'
+'" for ' +
+formatMoney(
+Number(transaction.amount)
+) +
+"?"
 );
 
 
 if (!confirmed) {
+
 return;
+
 }
 
 
-// IMPORTANT:
-// Only remove the transaction with this ID.
-transactions = transactions.filter(function(item) {
+try {
 
-return item.id !== id;
+// IMPORTANT:
+//
+// The ?id=eq.ID part means:
+// DELETE ONLY WHERE id equals this ID.
+//
+// It does NOT delete the whole table.
+
+await supabaseRequest(
+
+TRANSACTIONS_URL +
+"?id=eq." +
+encodeURIComponent(id),
+
+{
+method: "DELETE"
+}
+
+);
+
+
+// Remove the same transaction from our local array.
+
+transactions =
+transactions.filter(function(item) {
+
+return String(item.id) !== String(id);
 
 });
 
 
-saveTransactions();
-
 updateApp();
+
+
+alert("Transaction deleted.");
+
+
+} catch (error) {
+
+console.error(error);
+
+alert(
+"Could not delete this transaction.\n\n" +
+error.message
+);
+
+}
 
 }
 
 
-// ================================
-// CLEAR ALL TRANSACTIONS
-// ================================
+// Make the function available to your HTML onclick buttons.
 
-document.getElementById("clearAllBtn").addEventListener(
+window.deleteTransaction = deleteTransaction;
+
+
+// ============================================================
+// CLEAR ALL TRANSACTIONS
+// ============================================================
+//
+// This is the ONLY button that deletes everything.
+// ============================================================
+
+const clearAllBtn =
+document.getElementById("clearAllBtn");
+
+
+if (clearAllBtn) {
+
+clearAllBtn.addEventListener(
 "click",
-function() {
+async function() {
 
 if (transactions.length === 0) {
 
-alert("There are no transactions to clear.");
+alert(
+"There are no transactions to clear."
+);
 
 return;
+
 }
 
 
-const confirmed = confirm(
+const confirmed =
+confirm(
 "Are you sure you want to delete ALL transactions?"
 );
 
 
 if (!confirmed) {
+
 return;
+
 }
+
+
+try {
+
+// Delete all rows.
+//
+// The neq filter makes the request valid
+// while matching every existing ID.
+
+await supabaseRequest(
+
+TRANSACTIONS_URL +
+"?id=neq.0",
+
+{
+method: "DELETE"
+}
+
+);
 
 
 transactions = [];
 
-saveTransactions();
 
 updateApp();
+
+
+alert(
+"All transactions have been deleted."
+);
+
+
+} catch (error) {
+
+console.error(error);
+
+alert(
+"Could not clear all transactions.\n\n" +
+error.message
+);
+
+}
 
 }
 );
 
+}
 
-// ================================
+
+// ============================================================
 // CALCULATE TOTALS
-// ================================
+// ============================================================
 
 function calculateTotals() {
 
@@ -245,50 +597,84 @@ let expenses = 0;
 
 transactions.forEach(function(transaction) {
 
+const amount =
+Number(transaction.amount) || 0;
+
+
 if (transaction.type === "income") {
 
-income += transaction.amount;
+income += amount;
 
 } else {
 
-expenses += transaction.amount;
+expenses += amount;
 
 }
 
 });
 
 
-const balance = income - expenses;
+const balance =
+income - expenses;
 
 
 return {
+
 income: income,
+
 expenses: expenses,
+
 balance: balance
+
 };
 
 }
 
 
-// ================================
+// ============================================================
 // UPDATE DASHBOARD
-// ================================
+// ============================================================
 
 function updateDashboard() {
 
-const totals = calculateTotals();
+const totals =
+calculateTotals();
 
 
-document.getElementById("totalIncome").textContent =
+const totalIncome =
+document.getElementById("totalIncome");
+
+
+const totalExpenses =
+document.getElementById("totalExpenses");
+
+
+const balance =
+document.getElementById("balance");
+
+
+if (totalIncome) {
+
+totalIncome.textContent =
 formatMoney(totals.income);
 
+}
 
-document.getElementById("totalExpenses").textContent =
+
+if (totalExpenses) {
+
+totalExpenses.textContent =
 formatMoney(totals.expenses);
 
+}
 
-document.getElementById("balance").textContent =
+
+if (balance) {
+
+balance.textContent =
 formatMoney(totals.balance);
+
+}
 
 
 updateRecentTransactions();
@@ -298,32 +684,48 @@ updateGoalDisplay();
 }
 
 
-// ================================
-// DISPLAY RECENT TRANSACTIONS
-// ================================
+// ============================================================
+// RECENT TRANSACTIONS
+// ============================================================
 
 function updateRecentTransactions() {
 
 const container =
-document.getElementById("recentTransactions");
+document.getElementById(
+"recentTransactions"
+);
+
+
+if (!container) {
+
+return;
+
+}
 
 
 if (transactions.length === 0) {
 
 container.innerHTML = `
+
 <div class="empty">
+
 No transactions yet.
+
 </div>
+
 `;
 
 return;
+
 }
 
 
-const recent = transactions.slice(0, 5);
+const recent =
+transactions.slice(0, 5);
 
 
-container.innerHTML = recent.map(function(transaction) {
+container.innerHTML =
+recent.map(function(transaction) {
 
 return createTransactionHTML(
 transaction,
@@ -335,30 +737,46 @@ false
 }
 
 
-// ================================
-// DISPLAY ALL TRANSACTIONS
-// ================================
+// ============================================================
+// ALL TRANSACTIONS
+// ============================================================
 
 function updateAllTransactions() {
 
 const container =
-document.getElementById("allTransactions");
+document.getElementById(
+"allTransactions"
+);
+
+
+if (!container) {
+
+return;
+
+}
 
 
 if (transactions.length === 0) {
 
 container.innerHTML = `
+
 <div class="empty">
+
 No transactions yet.
+<br>
 Add your first transaction above.
+
 </div>
+
 `;
 
 return;
+
 }
 
 
-container.innerHTML = transactions.map(function(transaction) {
+container.innerHTML =
+transactions.map(function(transaction) {
 
 return createTransactionHTML(
 transaction,
@@ -370,49 +788,83 @@ true
 }
 
 
-// ================================
-// TRANSACTION HTML
-// ================================
+// ============================================================
+// CREATE TRANSACTION HTML
+// ============================================================
 
-function createTransactionHTML(transaction, showDelete) {
+function createTransactionHTML(
+transaction,
+showDelete
+) {
 
-const isIncome = transaction.type === "income";
+const isIncome =
+transaction.type === "income";
 
-const icon = isIncome ? "📈" : "📉";
 
-const sign = isIncome ? "+" : "-";
+const icon =
+isIncome ? "📈" : "📉";
 
-const deleteButton = showDelete
+
+const sign =
+isIncome ? "+" : "-";
+
+
+const deleteButton =
+showDelete
 ? `
+
 <button
 class="delete-btn"
-onclick="deleteTransaction(${transaction.id})"
+onclick="deleteTransaction('${String(
+transaction.id
+).replace(/'/g, "\\'")}')"
+type="button"
 >
 Delete
 </button>
+
 `
 : "";
 
 
 return `
+
 <div class="transaction">
 
 <div class="transaction-left">
 
-<div class="transaction-icon ${transaction.type}">
+<div class="transaction-icon ${escapeHTML(
+transaction.type
+)}">
+
 ${icon}
+
 </div>
+
 
 <div>
 
 <div class="transaction-name">
-${escapeHTML(transaction.name)}
+
+${escapeHTML(
+transaction.name || ""
+)}
+
 </div>
 
+
 <div class="transaction-details">
-${escapeHTML(transaction.category)}
+
+${escapeHTML(
+transaction.category || ""
+)}
+
 •
-${escapeHTML(transaction.date)}
+
+${escapeHTML(
+transaction.date || ""
+)}
+
 </div>
 
 </div>
@@ -422,56 +874,103 @@ ${escapeHTML(transaction.date)}
 
 <div class="transaction-right">
 
-<div class="transaction-amount ${transaction.type}">
-${sign} ${formatMoney(transaction.amount)}
+<div class="transaction-amount ${escapeHTML(
+transaction.type
+)}">
+
+${sign}
+
+${formatMoney(
+Number(transaction.amount) || 0
+)}
+
 </div>
+
 
 ${deleteButton}
 
 </div>
 
 </div>
+
 `;
 
 }
 
 
-// ================================
+// ============================================================
 // SAVINGS GOAL
-// ================================
+// ============================================================
 
-const goalForm = document.getElementById("goalForm");
+const goalForm =
+document.getElementById("goalForm");
 
-goalForm.addEventListener("submit", function(event) {
+
+if (goalForm) {
+
+goalForm.addEventListener(
+"submit",
+async function(event) {
 
 event.preventDefault();
 
 
 const name =
-document.getElementById("goalName").value.trim();
+document.getElementById(
+"goalName"
+).value.trim();
 
 
 const amount =
-parseFloat(document.getElementById("goalAmount").value);
+parseFloat(
+document.getElementById(
+"goalAmount"
+).value
+);
 
 
 if (!name) {
 
-alert("Please enter a goal name.");
+alert(
+"Please enter a goal name."
+);
 
 return;
+
 }
 
 
 if (!amount || amount <= 0) {
 
-alert("Please enter a valid goal amount.");
+alert(
+"Please enter a valid goal amount."
+);
 
 return;
+
 }
 
 
-savingsGoal = {
+try {
+
+// Remove old goal first.
+//
+// This application is designed to have
+// one active savings goal.
+
+await supabaseRequest(
+
+GOALS_URL +
+"?id=neq.0",
+
+{
+method: "DELETE"
+}
+
+);
+
+
+const newGoal = {
 
 name: name,
 
@@ -480,29 +979,80 @@ amount: amount
 };
 
 
-localStorage.setItem(
-"financialSavingsGoal",
-JSON.stringify(savingsGoal)
+const result =
+await supabaseRequest(
+GOALS_URL,
+{
+method: "POST",
+body: JSON.stringify(
+newGoal
+)
+}
 );
+
+
+if (
+Array.isArray(result) &&
+result.length > 0
+) {
+
+savingsGoal = {
+
+name:
+result[0].name || "",
+
+amount:
+Number(
+result[0].amount
+) || 0
+
+};
+
+} else {
+
+savingsGoal =
+newGoal;
+
+}
 
 
 updateGoalDisplay();
 
-alert("Savings goal saved!");
 
-});
+alert(
+"Savings goal saved!"
+);
 
 
-// ================================
-// UPDATE SAVINGS GOAL
-// ================================
+} catch (error) {
+
+console.error(error);
+
+alert(
+"Could not save the savings goal.\n\n" +
+error.message
+);
+
+}
+
+}
+);
+
+}
+
+
+// ============================================================
+// UPDATE SAVINGS GOAL DISPLAY
+// ============================================================
 
 function updateGoalDisplay() {
 
-const totals = calculateTotals();
+const totals =
+calculateTotals();
 
 
-const saved = Math.max(
+const saved =
+Math.max(
 0,
 totals.balance
 );
@@ -519,8 +1069,8 @@ percent =
 }
 
 
-// Never display more than 100%
-percent = Math.min(
+percent =
+Math.min(
 100,
 Math.max(0, percent)
 );
@@ -530,55 +1080,169 @@ const roundedPercent =
 Math.round(percent);
 
 
+// --------------------------------------------------------
 // Goals page
-document.getElementById("goalDisplayName").textContent =
-savingsGoal.name || "No goal set";
+// --------------------------------------------------------
 
-
-document.getElementById("goalPercent").textContent =
-roundedPercent + "%";
-
-
-document.getElementById("goalSaved").textContent =
-formatMoney(saved) + " saved";
-
-
-document.getElementById("goalTarget").textContent =
-"Goal: " + formatMoney(savingsGoal.amount);
-
-
-document.getElementById("goalProgressBar").style.width =
-roundedPercent + "%";
-
-
-// Dashboard
-document.getElementById("dashboardGoalName").textContent =
-savingsGoal.name || "Set a savings goal";
-
-
-document.getElementById("dashboardGoalPercent").textContent =
-roundedPercent + "%";
-
-
-document.getElementById("dashboardSaved").textContent =
-formatMoney(saved) + " saved";
-
-
-document.getElementById("dashboardGoalAmount").textContent =
-"Goal: " + formatMoney(savingsGoal.amount);
-
-
+const goalDisplayName =
 document.getElementById(
-"dashboardProgressBar"
-).style.width =
+"goalDisplayName"
+);
+
+
+const goalPercent =
+document.getElementById(
+"goalPercent"
+);
+
+
+const goalSaved =
+document.getElementById(
+"goalSaved"
+);
+
+
+const goalTarget =
+document.getElementById(
+"goalTarget"
+);
+
+
+const goalProgressBar =
+document.getElementById(
+"goalProgressBar"
+);
+
+
+if (goalDisplayName) {
+
+goalDisplayName.textContent =
+savingsGoal.name ||
+"No goal set";
+
+}
+
+
+if (goalPercent) {
+
+goalPercent.textContent =
 roundedPercent + "%";
 
 }
 
 
-// ================================
+if (goalSaved) {
+
+goalSaved.textContent =
+formatMoney(saved) +
+" saved";
+
+}
+
+
+if (goalTarget) {
+
+goalTarget.textContent =
+"Goal: " +
+formatMoney(
+savingsGoal.amount
+);
+
+}
+
+
+if (goalProgressBar) {
+
+goalProgressBar.style.width =
+roundedPercent + "%";
+
+}
+
+
+// --------------------------------------------------------
+// Dashboard
+// --------------------------------------------------------
+
+const dashboardGoalName =
+document.getElementById(
+"dashboardGoalName"
+);
+
+
+const dashboardGoalPercent =
+document.getElementById(
+"dashboardGoalPercent"
+);
+
+
+const dashboardSaved =
+document.getElementById(
+"dashboardSaved"
+);
+
+
+const dashboardGoalAmount =
+document.getElementById(
+"dashboardGoalAmount"
+);
+
+
+const dashboardProgressBar =
+document.getElementById(
+"dashboardProgressBar"
+);
+
+
+if (dashboardGoalName) {
+
+dashboardGoalName.textContent =
+savingsGoal.name ||
+"Set a savings goal";
+
+}
+
+
+if (dashboardGoalPercent) {
+
+dashboardGoalPercent.textContent =
+roundedPercent + "%";
+
+}
+
+
+if (dashboardSaved) {
+
+dashboardSaved.textContent =
+formatMoney(saved) +
+" saved";
+
+}
+
+
+if (dashboardGoalAmount) {
+
+dashboardGoalAmount.textContent =
+"Goal: " +
+formatMoney(
+savingsGoal.amount
+);
+
+}
+
+
+if (dashboardProgressBar) {
+
+dashboardProgressBar.style.width =
+roundedPercent + "%";
+
+}
+
+}
+
+
+// ============================================================
 // FORMAT MONEY
-// ================================
+// ============================================================
 
 function formatMoney(amount) {
 
@@ -588,29 +1252,35 @@ return new Intl.NumberFormat(
 style: "currency",
 currency: "USD"
 }
-).format(amount);
+).format(
+Number(amount) || 0
+);
 
 }
 
 
-// ================================
+// ============================================================
 // SECURITY / TEXT CLEANING
-// ================================
+// ============================================================
 
 function escapeHTML(text) {
 
-const div = document.createElement("div");
+const div =
+document.createElement("div");
 
-div.textContent = text;
+
+div.textContent =
+text == null ? "" : String(text);
+
 
 return div.innerHTML;
 
 }
 
 
-// ================================
+// ============================================================
 // UPDATE EVERYTHING
-// ================================
+// ============================================================
 
 function updateApp() {
 
@@ -623,10 +1293,30 @@ updateGoalDisplay();
 }
 
 
-// ================================
-// START APP
-// ================================
+// ============================================================
+// START APPLICATION
+// ============================================================
+
+async function startApp() {
+
+// Show dashboard immediately.
 
 updateApp();
 
 showPage("dashboard");
+
+
+// Then load the real data from Supabase.
+
+await loadTransactions();
+
+await loadSavingsGoal();
+
+updateApp();
+
+}
+
+
+// Start
+
+startApp();

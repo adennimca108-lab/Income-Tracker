@@ -1,7 +1,8 @@
 /* ==========================================
 MONEY TRACKER
-GITHUB ONLY
 LOCAL STORAGE
+CHARTS
+PAYMENT TOTALS
 ========================================== */
 
 
@@ -739,6 +740,8 @@ function updateApp() {
 
 updateDashboard();
 
+updateCharts();
+
 updateRecentTransactions();
 
 updateAllTransactions();
@@ -748,6 +751,8 @@ updateGoal();
 updatePayments();
 
 updateDashboardPayments();
+
+updatePaymentTotals();
 
 }
 
@@ -808,6 +813,328 @@ totals.balance
 );
 
 }
+
+}
+
+
+/* ==========================================
+INCOME VS EXPENSE CHART
+========================================== */
+
+function updateCharts() {
+
+updateIncomeExpenseChart();
+
+updateCategoryChart();
+
+}
+
+
+function updateIncomeExpenseChart() {
+
+const totals =
+calculateTotals();
+
+
+const income =
+totals.income;
+
+
+const expenses =
+totals.expenses;
+
+
+const maximum =
+Math.max(
+income,
+expenses,
+1
+);
+
+
+const incomeHeight =
+Math.min(
+100,
+(income / maximum) * 100
+);
+
+
+const expenseHeight =
+Math.min(
+100,
+(expenses / maximum) * 100
+);
+
+
+const incomeBar =
+document.getElementById(
+"incomeBar"
+);
+
+
+const expenseBar =
+document.getElementById(
+"expenseBar"
+);
+
+
+const incomeValue =
+document.getElementById(
+"incomeBarValue"
+);
+
+
+const expenseValue =
+document.getElementById(
+"expenseBarValue"
+);
+
+
+const chartIncomeTotal =
+document.getElementById(
+"chartIncomeTotal"
+);
+
+
+const chartExpenseTotal =
+document.getElementById(
+"chartExpenseTotal"
+);
+
+
+if (incomeBar) {
+
+incomeBar.style.height =
+incomeHeight + "%";
+
+}
+
+
+if (expenseBar) {
+
+expenseBar.style.height =
+expenseHeight + "%";
+
+}
+
+
+if (incomeValue) {
+
+incomeValue.textContent =
+moneyShort(income);
+
+}
+
+
+if (expenseValue) {
+
+expenseValue.textContent =
+moneyShort(expenses);
+
+}
+
+
+if (chartIncomeTotal) {
+
+chartIncomeTotal.textContent =
+money(income);
+
+}
+
+
+if (chartExpenseTotal) {
+
+chartExpenseTotal.textContent =
+money(expenses);
+
+}
+
+}
+
+
+/* ==========================================
+CATEGORY CHART
+========================================== */
+
+function updateCategoryChart() {
+
+const categoryChart =
+document.getElementById(
+"categoryChart"
+);
+
+
+const legend =
+document.getElementById(
+"categoryLegend"
+);
+
+
+if (!categoryChart || !legend) {
+return;
+}
+
+
+const categoryData =
+categoryTotals(
+transactions,
+"expense"
+);
+
+
+const entries =
+Object.entries(
+categoryData
+)
+.filter(
+function (entry) {
+
+return entry[1] > 0;
+
+}
+)
+.sort(
+function (a, b) {
+
+return b[1] - a[1];
+
+}
+);
+
+
+if (entries.length === 0) {
+
+categoryChart.style.background =
+"#edf1f1";
+
+
+legend.innerHTML = `
+<div class="empty-state">
+No expenses yet.
+</div>
+`;
+
+return;
+
+}
+
+
+const total =
+entries.reduce(
+function (sum, entry) {
+
+return sum + entry[1];
+
+},
+0
+);
+
+
+const chartColors = [
+
+"#287d6d",
+"#c84d4d",
+"#356aa0",
+"#b8860b",
+"#7455a6",
+"#6a8f9b",
+"#d06b43",
+"#557c55",
+"#8a5a83",
+"#777777"
+
+];
+
+
+let currentAngle = 0;
+
+const segments = [];
+
+
+entries.forEach(
+function (entry, index) {
+
+const percentage =
+(entry[1] / total) * 100;
+
+
+const start =
+currentAngle;
+
+
+const end =
+currentAngle +
+percentage;
+
+
+segments.push(
+chartColors[
+index % chartColors.length
+] +
+" " +
+start +
+"% " +
+end +
+"%"
+);
+
+
+currentAngle = end;
+
+}
+);
+
+
+categoryChart.style.background =
+"conic-gradient(" +
+segments.join(",") +
+")";
+
+
+legend.innerHTML =
+entries
+.map(
+function (entry, index) {
+
+const category =
+entry[0];
+
+
+const amount =
+entry[1];
+
+
+const color =
+chartColors[
+index %
+chartColors.length
+];
+
+
+return `
+
+<div class="legend-item">
+
+<span
+class="legend-dot"
+style="background:${color}"
+></span>
+
+<span class="legend-name">
+${escapeHTML(category)}
+</span>
+
+<span class="legend-value">
+${money(amount)}
+</span>
+
+</div>
+
+`;
+
+}
+)
+.join("");
 
 }
 
@@ -1500,15 +1827,18 @@ document.getElementById(
 
 
 if (goalName) {
+
 goalName.value =
 savingsGoal.name;
+
 }
 
 
 if (goalAmount) {
 
 goalAmount.value =
-savingsGoal.amount || "";
+savingsGoal.amount ||
+"";
 
 }
 
@@ -1537,7 +1867,6 @@ form.addEventListener(
 function (event) {
 
 event.preventDefault();
-
 
 addPayment();
 
@@ -1712,6 +2041,154 @@ return "upcoming";
 
 
 /* ==========================================
+PAYMENT TOTALS
+========================================== */
+
+function calculatePaymentTotals() {
+
+let upcomingTotal = 0;
+
+let recurringTotal = 0;
+
+
+payments.forEach(
+function (payment) {
+
+const status =
+getPaymentStatus(
+payment
+);
+
+
+const amount =
+Number(
+payment.amount
+) || 0;
+
+
+/*
+Upcoming total includes
+unpaid payments only.
+*/
+
+if (
+status !== "paid"
+) {
+
+upcomingTotal += amount;
+
+}
+
+
+/*
+Recurring total includes
+unpaid recurring payments.
+*/
+
+if (
+payment.recurring !==
+"none" &&
+status !== "paid"
+) {
+
+recurringTotal += amount;
+
+}
+
+}
+);
+
+
+return {
+
+upcoming:
+Math.round(
+upcomingTotal * 100
+) / 100,
+
+recurring:
+Math.round(
+recurringTotal * 100
+) / 100
+
+};
+
+}
+
+
+function updatePaymentTotals() {
+
+const totals =
+calculatePaymentTotals();
+
+
+const dashboardUpcoming =
+document.getElementById(
+"totalUpcomingPayments"
+);
+
+
+const dashboardRecurring =
+document.getElementById(
+"totalRecurringPayments"
+);
+
+
+const pageUpcoming =
+document.getElementById(
+"paymentsPageTotal"
+);
+
+
+const pageRecurring =
+document.getElementById(
+"paymentsPageRecurring"
+);
+
+
+if (dashboardUpcoming) {
+
+dashboardUpcoming.textContent =
+money(
+totals.upcoming
+);
+
+}
+
+
+if (dashboardRecurring) {
+
+dashboardRecurring.textContent =
+money(
+totals.recurring
+);
+
+}
+
+
+if (pageUpcoming) {
+
+pageUpcoming.textContent =
+money(
+totals.upcoming
+);
+
+}
+
+
+if (pageRecurring) {
+
+pageRecurring.textContent =
+money(
+totals.recurring
+);
+
+}
+
+}
+
+
+/* ==========================================
 PAYMENT DISPLAY
 ========================================== */
 
@@ -1751,7 +2228,9 @@ function (a, b) {
 return String(
 a.dueDate
 ).localeCompare(
-String(b.dueDate)
+String(
+b.dueDate
+)
 );
 
 }
@@ -1774,7 +2253,9 @@ payment
 }
 
 
-function paymentHTML(payment) {
+function paymentHTML(
+payment
+) {
 
 const status =
 getPaymentStatus(
@@ -1783,8 +2264,11 @@ payment
 
 
 const recurringText =
-payment.recurring === "none"
+payment.recurring ===
+"none"
+
 ? "One-time"
+
 : capitalize(
 payment.recurring
 );
@@ -1857,6 +2341,7 @@ status
 
 ${
 status !== "paid"
+
 ? `
 <button
 type="button"
@@ -1868,6 +2353,7 @@ payment.id
 Paid
 </button>
 `
+
 : ""
 }
 
@@ -1973,8 +2459,8 @@ updateApp();
 
 
 /*
-If this payment is recurring,
-create the next payment.
+If recurring,
+create next payment.
 */
 
 if (
@@ -2186,9 +2672,11 @@ payments
 .filter(
 function (payment) {
 
-return getPaymentStatus(
+return (
+getPaymentStatus(
 payment
-) !== "paid";
+) !== "paid"
+);
 
 }
 )
@@ -2452,7 +2940,10 @@ document.getElementById(
 ).value;
 
 
-if (!startDate || !endDate) {
+if (
+!startDate ||
+!endDate
+) {
 
 alert(
 "Please select a start and end date."
@@ -2463,7 +2954,10 @@ return;
 }
 
 
-if (startDate > endDate) {
+if (
+startDate >
+endDate
+) {
 
 alert(
 "Start date cannot be after end date."
@@ -2479,8 +2973,10 @@ transactions.filter(
 function (transaction) {
 
 return (
-transaction.date >= startDate &&
-transaction.date <= endDate
+transaction.date >=
+startDate &&
+transaction.date <=
+endDate
 );
 
 }
@@ -2498,8 +2994,10 @@ payments.filter(
 function (payment) {
 
 return (
-payment.dueDate >= startDate &&
-payment.dueDate <= endDate
+payment.dueDate >=
+startDate &&
+payment.dueDate <=
+endDate
 );
 
 }
@@ -2727,7 +3225,8 @@ function (transaction) {
 if (
 String(
 transaction.type
-).toLowerCase() !== type
+).toLowerCase() !==
+type
 ) {
 
 return;
@@ -2992,6 +3491,50 @@ Number(value) || 0
 }
 
 
+function moneyShort(value) {
+
+const number =
+Number(value) || 0;
+
+
+if (
+number >= 1000000
+) {
+
+return (
+"$" +
+(
+number / 1000000
+).toFixed(1) +
+"M"
+);
+
+}
+
+
+if (
+number >= 1000
+) {
+
+return (
+"$" +
+(
+number / 1000
+).toFixed(1) +
+"K"
+);
+
+}
+
+
+return (
+"$" +
+Math.round(number)
+);
+
+}
+
+
 /* ==========================================
 DATE
 ========================================== */
@@ -3004,7 +3547,9 @@ return "";
 
 
 const parts =
-String(value).split("-");
+String(
+value
+).split("-");
 
 
 if (
@@ -3125,7 +3670,9 @@ return div.innerHTML;
 }
 
 
-function escapeAttribute(value) {
+function escapeAttribute(
+value
+) {
 
 return String(value)
 

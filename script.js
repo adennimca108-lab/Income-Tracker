@@ -1,15 +1,24 @@
-// ============================================================
-// INCOME TRACKER
-// GITHUB ONLY VERSION
-// No Supabase
-// No login
-// Uses browser localStorage
-// ============================================================
+/* ==========================================
+MONEY TRACKER
+GITHUB ONLY
+LOCAL STORAGE
+========================================== */
 
 
-// ============================================================
-// APP DATA
-// ============================================================
+/* ==========================================
+STORAGE
+========================================== */
+
+const TRANSACTIONS_STORAGE =
+"moneyTrackerTransactions";
+
+const GOAL_STORAGE =
+"moneyTrackerGoal";
+
+
+/* ==========================================
+DATA
+========================================== */
 
 let transactions = [];
 
@@ -18,14 +27,16 @@ name: "",
 amount: 0
 };
 
+let currentType = "income";
 
-// ============================================================
-// START APP
-// ============================================================
 
-document.addEventListener("DOMContentLoaded", function () {
+/* ==========================================
+START
+========================================== */
 
-console.log("Income Tracker started.");
+document.addEventListener(
+"DOMContentLoaded",
+function () {
 
 loadData();
 
@@ -33,45 +44,45 @@ setupNavigation();
 
 setupTransactionForm();
 
+setupTypeButtons();
+
 setupGoalForm();
 
-setupClearAllButton();
+setupClearButton();
 
-setupViewTransactionsButton();
+setupDashboardButtons();
 
-setTodayDate();
+setToday();
 
 updateApp();
 
-showPage("dashboard");
+showPage("dashboardPage");
 
-});
-
-
-// ============================================================
-// LOCAL STORAGE
-// ============================================================
-
-const TRANSACTIONS_KEY = "incomeTrackerTransactions";
-
-const GOAL_KEY = "incomeTrackerSavingsGoal";
+}
+);
 
 
-// ============================================================
-// LOAD DATA
-// ============================================================
+/* ==========================================
+LOAD DATA
+========================================== */
 
 function loadData() {
 
 try {
 
 const savedTransactions =
-localStorage.getItem(TRANSACTIONS_KEY);
+localStorage.getItem(
+TRANSACTIONS_STORAGE
+);
+
 
 if (savedTransactions) {
 
 const parsed =
-JSON.parse(savedTransactions);
+JSON.parse(
+savedTransactions
+);
+
 
 if (Array.isArray(parsed)) {
 
@@ -83,21 +94,30 @@ transactions = parsed;
 
 
 const savedGoal =
-localStorage.getItem(GOAL_KEY);
+localStorage.getItem(
+GOAL_STORAGE
+);
+
 
 if (savedGoal) {
 
 const parsedGoal =
-JSON.parse(savedGoal);
+JSON.parse(
+savedGoal
+);
+
 
 if (parsedGoal) {
 
 savingsGoal = {
 
-name: parsedGoal.name || "",
+name:
+parsedGoal.name || "",
 
 amount:
-Number(parsedGoal.amount) || 0
+Number(
+parsedGoal.amount
+) || 0
 
 };
 
@@ -108,7 +128,7 @@ Number(parsedGoal.amount) || 0
 } catch (error) {
 
 console.error(
-"Could not load saved data:",
+"Loading error:",
 error
 );
 
@@ -124,143 +144,130 @@ amount: 0
 }
 
 
-// ============================================================
-// SAVE TRANSACTIONS
-// ============================================================
+/* ==========================================
+SAVE DATA
+========================================== */
 
 function saveTransactions() {
 
-try {
-
 localStorage.setItem(
-TRANSACTIONS_KEY,
+TRANSACTIONS_STORAGE,
 JSON.stringify(transactions)
 );
 
-} catch (error) {
-
-console.error(
-"Could not save transactions:",
-error
-);
-
-alert(
-"Your browser could not save the transaction."
-);
-
 }
 
-}
-
-
-// ============================================================
-// SAVE GOAL
-// ============================================================
 
 function saveGoal() {
 
-try {
-
 localStorage.setItem(
-GOAL_KEY,
+GOAL_STORAGE,
 JSON.stringify(savingsGoal)
 );
 
-} catch (error) {
-
-console.error(
-"Could not save savings goal:",
-error
-);
-
-alert(
-"Your browser could not save the savings goal."
-);
-
-}
-
 }
 
 
-// ============================================================
-// NAVIGATION
-// ============================================================
+/* ==========================================
+NAVIGATION
+========================================== */
 
 function setupNavigation() {
 
 const buttons =
-document.querySelectorAll(".nav-btn");
+document.querySelectorAll(
+".bottom-nav-button"
+);
 
 
-buttons.forEach(function (button) {
+buttons.forEach(
+function (button) {
 
 button.addEventListener(
 "click",
 function () {
 
 const page =
-button.getAttribute("data-page");
+button.getAttribute(
+"data-page"
+);
+
 
 showPage(page);
 
 }
 );
 
-});
+}
+);
 
 }
 
 
-// ============================================================
-// SHOW PAGE
-// ============================================================
-
-function showPage(pageName) {
+function showPage(pageId) {
 
 const pages =
-document.querySelectorAll(".page");
+document.querySelectorAll(
+".page"
+);
 
 
-pages.forEach(function (page) {
+pages.forEach(
+function (page) {
 
-page.classList.remove("active-page");
+page.classList.remove(
+"active"
+);
 
-});
+}
+);
 
 
-const selectedPage =
-document.getElementById(pageName);
+const selected =
+document.getElementById(
+pageId
+);
 
 
-if (selectedPage) {
+if (selected) {
 
-selectedPage.classList.add("active-page");
+selected.classList.add(
+"active"
+);
 
 }
 
 
 const buttons =
-document.querySelectorAll(".nav-btn");
+document.querySelectorAll(
+".bottom-nav-button"
+);
 
 
-buttons.forEach(function (button) {
+buttons.forEach(
+function (button) {
 
-button.classList.remove("active");
+button.classList.remove(
+"active"
+);
 
-});
+}
+);
 
 
 const activeButton =
 document.querySelector(
-'.nav-btn[data-page="' +
-pageName +
+'[data-page="' +
+pageId +
 '"]'
 );
 
 
 if (activeButton) {
 
-activeButton.classList.add("active");
+activeButton.classList.add(
+"active"
+);
 
 }
 
@@ -273,19 +280,112 @@ behavior: "smooth"
 }
 
 
-// ============================================================
-// TODAY'S DATE
-// ============================================================
+/* ==========================================
+TYPE BUTTONS
+========================================== */
 
-function setTodayDate() {
+function setupTypeButtons() {
 
-const dateInput =
+const incomeButton =
+document.getElementById(
+"incomeTypeButton"
+);
+
+
+const expenseButton =
+document.getElementById(
+"expenseTypeButton"
+);
+
+
+incomeButton.addEventListener(
+"click",
+function () {
+
+setTransactionType(
+"income"
+);
+
+}
+);
+
+
+expenseButton.addEventListener(
+"click",
+function () {
+
+setTransactionType(
+"expense"
+);
+
+}
+);
+
+}
+
+
+function setTransactionType(type) {
+
+currentType = type;
+
+
+document.getElementById(
+"transactionType"
+).value = type;
+
+
+const incomeButton =
+document.getElementById(
+"incomeTypeButton"
+);
+
+
+const expenseButton =
+document.getElementById(
+"expenseTypeButton"
+);
+
+
+incomeButton.classList.remove(
+"selected-income"
+);
+
+
+expenseButton.classList.remove(
+"selected-expense"
+);
+
+
+if (type === "income") {
+
+incomeButton.classList.add(
+"selected-income"
+);
+
+} else {
+
+expenseButton.classList.add(
+"selected-expense"
+);
+
+}
+
+}
+
+
+/* ==========================================
+TODAY
+========================================== */
+
+function setToday() {
+
+const input =
 document.getElementById(
 "transactionDate"
 );
 
 
-if (!dateInput) {
+if (!input) {
 return;
 }
 
@@ -310,17 +410,19 @@ today.getDate()
 ).padStart(2, "0");
 
 
-dateInput.value =
-year + "-" +
-month + "-" +
+input.value =
+year +
+"-" +
+month +
+"-" +
 day;
 
 }
 
 
-// ============================================================
-// TRANSACTION FORM
-// ============================================================
+/* ==========================================
+TRANSACTION FORM
+========================================== */
 
 function setupTransactionForm() {
 
@@ -333,7 +435,7 @@ document.getElementById(
 if (!form) {
 
 console.error(
-"Transaction form not found."
+"Transaction form missing."
 );
 
 return;
@@ -347,6 +449,20 @@ function (event) {
 
 event.preventDefault();
 
+
+addTransaction();
+
+}
+);
+
+}
+
+
+/* ==========================================
+ADD TRANSACTION
+========================================== */
+
+function addTransaction() {
 
 const type =
 document.getElementById(
@@ -366,10 +482,12 @@ document.getElementById(
 ).value;
 
 
-const amountInput =
+const amount =
+Number(
 document.getElementById(
 "transactionAmount"
-).value;
+).value
+);
 
 
 const date =
@@ -378,11 +496,7 @@ document.getElementById(
 ).value;
 
 
-const amount =
-Number(amountInput);
-
-
-// Validate description
+/* VALIDATION */
 
 if (!name) {
 
@@ -395,23 +509,19 @@ return;
 }
 
 
-// Validate amount
-
 if (
 !Number.isFinite(amount) ||
 amount <= 0
 ) {
 
 alert(
-"Please enter a valid amount greater than $0."
+"Please enter an amount greater than $0."
 );
 
 return;
 
 }
 
-
-// Validate date
 
 if (!date) {
 
@@ -424,12 +534,12 @@ return;
 }
 
 
-// Create transaction
+/* CREATE */
 
-const newTransaction = {
+const transaction = {
 
 id:
-Date.now() +
+Date.now().toString() +
 Math.random()
 .toString(16)
 .slice(2),
@@ -445,236 +555,62 @@ Math.round(
 amount * 100
 ) / 100,
 
-date: date,
-
-createdAt:
-new Date().toISOString()
+date: date
 
 };
 
 
-console.log(
-"Adding transaction:",
-newTransaction
-);
-
-
-// Add to beginning
+/* ADD */
 
 transactions.unshift(
-newTransaction
+transaction
 );
 
 
-// Save
+/* SAVE */
 
 saveTransactions();
 
 
-// Update screen
+/* UPDATE */
 
 updateApp();
 
 
-// Clear form
+/* RESET */
 
-form.reset();
-
-
-// Put today's date back
-
-setTodayDate();
+document.getElementById(
+"transactionName"
+).value = "";
 
 
-// Show success message
+document.getElementById(
+"transactionAmount"
+).value = "";
+
+
+setToday();
+
+
+/* SUCCESS */
 
 alert(
 "Transaction added successfully!"
 );
 
 
-// Go to transactions page
+/* GO HOME */
 
-showPage("transactions");
-
-}
+showPage(
+"dashboardPage"
 );
 
 }
 
 
-// ============================================================
-// DELETE TRANSACTION
-// ============================================================
-
-function deleteTransaction(id) {
-
-const transaction =
-transactions.find(
-function (item) {
-
-return String(item.id) ===
-String(id);
-
-}
-);
-
-
-if (!transaction) {
-
-alert(
-"Transaction not found."
-);
-
-return;
-
-}
-
-
-const amount =
-formatMoney(
-Number(transaction.amount)
-);
-
-
-const confirmed =
-confirm(
-'Delete "' +
-transaction.name +
-'" for ' +
-amount +
-"?"
-);
-
-
-if (!confirmed) {
-
-return;
-
-}
-
-
-transactions =
-transactions.filter(
-function (item) {
-
-return String(item.id) !==
-String(id);
-
-}
-);
-
-
-saveTransactions();
-
-updateApp();
-
-}
-
-
-// Make function available to buttons
-
-window.deleteTransaction =
-deleteTransaction;
-
-
-// ============================================================
-// CLEAR ALL
-// ============================================================
-
-function setupClearAllButton() {
-
-const button =
-document.getElementById(
-"clearAllBtn"
-);
-
-
-if (!button) {
-return;
-}
-
-
-button.addEventListener(
-"click",
-function () {
-
-if (
-transactions.length === 0
-) {
-
-alert(
-"There are no transactions to delete."
-);
-
-return;
-
-}
-
-
-const confirmed =
-confirm(
-"Are you sure you want to delete ALL transactions?"
-);
-
-
-if (!confirmed) {
-
-return;
-
-}
-
-
-transactions = [];
-
-
-saveTransactions();
-
-updateApp();
-
-
-alert(
-"All transactions have been deleted."
-);
-
-}
-);
-
-}
-
-
-// ============================================================
-// VIEW ALL TRANSACTIONS BUTTON
-// ============================================================
-
-function setupViewTransactionsButton() {
-
-const button =
-document.getElementById(
-"viewTransactionsBtn"
-);
-
-
-if (!button) {
-return;
-}
-
-
-button.addEventListener(
-"click",
-function () {
-
-showPage("transactions");
-
-}
-);
-
-}
-
-
-// ============================================================
-// CALCULATE TOTALS
-// ============================================================
+/* ==========================================
+CALCULATE TOTALS
+========================================== */
 
 function calculateTotals() {
 
@@ -687,12 +623,15 @@ transactions.forEach(
 function (transaction) {
 
 const amount =
-Number(transaction.amount) || 0;
+Number(
+transaction.amount
+) || 0;
 
 
 if (
-String(transaction.type)
-.toLowerCase() ===
+String(
+transaction.type
+).toLowerCase() ===
 "income"
 ) {
 
@@ -722,24 +661,26 @@ income - expenses
 }
 
 
-// ============================================================
-// UPDATE APP
-// ============================================================
+/* ==========================================
+UPDATE EVERYTHING
+========================================== */
 
 function updateApp() {
 
 updateDashboard();
 
+updateRecentTransactions();
+
 updateAllTransactions();
 
-updateGoalDisplay();
+updateGoal();
 
 }
 
 
-// ============================================================
-// UPDATE DASHBOARD
-// ============================================================
+/* ==========================================
+DASHBOARD
+========================================== */
 
 function updateDashboard() {
 
@@ -747,62 +688,35 @@ const totals =
 calculateTotals();
 
 
-const incomeElement =
 document.getElementById(
 "totalIncome"
-);
-
-
-const expensesElement =
-document.getElementById(
-"totalExpenses"
-);
-
-
-const balanceElement =
-document.getElementById(
-"balance"
-);
-
-
-if (incomeElement) {
-
-incomeElement.textContent =
-formatMoney(
+).textContent =
+money(
 totals.income
 );
 
-}
 
-
-if (expensesElement) {
-
-expensesElement.textContent =
-formatMoney(
+document.getElementById(
+"totalExpenses"
+).textContent =
+money(
 totals.expenses
 );
 
-}
 
-
-if (balanceElement) {
-
-balanceElement.textContent =
-formatMoney(
+document.getElementById(
+"balance"
+).textContent =
+money(
 totals.balance
 );
 
 }
 
 
-updateRecentTransactions();
-
-}
-
-
-// ============================================================
-// RECENT TRANSACTIONS
-// ============================================================
+/* ==========================================
+RECENT TRANSACTIONS
+========================================== */
 
 function updateRecentTransactions() {
 
@@ -812,18 +726,14 @@ document.getElementById(
 );
 
 
-if (!container) {
-return;
-}
-
-
 if (
 transactions.length === 0
 ) {
 
 container.innerHTML = `
-<div class="empty">
-No transactions yet.
+<div class="empty-state">
+No transactions yet.<br>
+Add your first transaction.
 </div>
 `;
 
@@ -833,7 +743,10 @@ return;
 
 
 const recent =
-transactions.slice(0, 5);
+transactions.slice(
+0,
+5
+);
 
 
 container.innerHTML =
@@ -841,7 +754,7 @@ recent
 .map(
 function (transaction) {
 
-return createTransactionHTML(
+return transactionHTML(
 transaction,
 false
 );
@@ -853,9 +766,9 @@ false
 }
 
 
-// ============================================================
-// ALL TRANSACTIONS
-// ============================================================
+/* ==========================================
+ALL TRANSACTIONS
+========================================== */
 
 function updateAllTransactions() {
 
@@ -865,8 +778,22 @@ document.getElementById(
 );
 
 
-if (!container) {
-return;
+const count =
+document.getElementById(
+"transactionCount"
+);
+
+
+if (count) {
+
+count.textContent =
+transactions.length +
+(
+transactions.length === 1
+? " transaction"
+: " transactions"
+);
+
 }
 
 
@@ -875,10 +802,9 @@ transactions.length === 0
 ) {
 
 container.innerHTML = `
-<div class="empty">
-No transactions yet.
-<br>
-Add your first transaction above.
+<div class="empty-state">
+No transactions yet.<br>
+Add your first transaction.
 </div>
 `;
 
@@ -892,7 +818,7 @@ transactions
 .map(
 function (transaction) {
 
-return createTransactionHTML(
+return transactionHTML(
 transaction,
 true
 );
@@ -904,25 +830,26 @@ true
 }
 
 
-// ============================================================
-// CREATE TRANSACTION HTML
-// ============================================================
+/* ==========================================
+TRANSACTION HTML
+========================================== */
 
-function createTransactionHTML(
+function transactionHTML(
 transaction,
 showDelete
 ) {
 
 const isIncome =
-String(transaction.type)
-.toLowerCase() ===
+String(
+transaction.type
+).toLowerCase() ===
 "income";
 
 
 const icon =
 isIncome
-? "📈"
-: "📉";
+? "↑"
+: "↓";
 
 
 const sign =
@@ -932,37 +859,25 @@ isIncome
 
 
 const amount =
-formatMoney(
-Number(transaction.amount) || 0
+money(
+transaction.amount
 );
 
 
-const formattedDate =
-formatDate(
-transaction.date
-);
-
-
-let deleteButton = "";
-
-
-if (showDelete) {
-
-deleteButton = `
-
+const deleteButton =
+showDelete
+? `
 <button
-class="delete-btn"
 type="button"
+class="delete-button"
 data-delete-id="${escapeAttribute(
 transaction.id
 )}"
 >
 Delete
 </button>
-
-`;
-
-}
+`
+: "";
 
 
 return `
@@ -987,7 +902,6 @@ transaction.name
 )}
 </div>
 
-
 <div class="transaction-details">
 
 ${escapeHTML(
@@ -996,8 +910,8 @@ transaction.category
 
 •
 
-${escapeHTML(
-formattedDate
+${formatDate(
+transaction.date
 )}
 
 </div>
@@ -1009,14 +923,14 @@ formattedDate
 
 <div class="transaction-right">
 
-<div class="
+<span class="
 transaction-amount
 ${isIncome ? "income" : "expense"}
 ">
 
 ${sign}${amount}
 
-</div>
+</span>
 
 
 ${deleteButton}
@@ -1030,9 +944,9 @@ ${deleteButton}
 }
 
 
-// ============================================================
-// DELETE BUTTON HANDLER
-// ============================================================
+/* ==========================================
+DELETE TRANSACTION
+========================================== */
 
 document.addEventListener(
 "click",
@@ -1061,9 +975,118 @@ deleteTransaction(id);
 );
 
 
-// ============================================================
-// SAVINGS GOAL FORM
-// ============================================================
+function deleteTransaction(id) {
+
+const transaction =
+transactions.find(
+function (item) {
+
+return String(
+item.id
+) === String(id);
+
+}
+);
+
+
+if (!transaction) {
+return;
+}
+
+
+const confirmed =
+confirm(
+'Delete "' +
+transaction.name +
+'"?'
+);
+
+
+if (!confirmed) {
+return;
+}
+
+
+transactions =
+transactions.filter(
+function (item) {
+
+return String(
+item.id
+) !== String(id);
+
+}
+);
+
+
+saveTransactions();
+
+updateApp();
+
+}
+
+
+/* ==========================================
+CLEAR ALL
+========================================== */
+
+function setupClearButton() {
+
+const button =
+document.getElementById(
+"clearAllButton"
+);
+
+
+button.addEventListener(
+"click",
+function () {
+
+if (
+transactions.length === 0
+) {
+
+alert(
+"There are no transactions."
+);
+
+return;
+
+}
+
+
+const confirmed =
+confirm(
+"Delete all transactions?"
+);
+
+
+if (!confirmed) {
+return;
+}
+
+
+transactions = [];
+
+
+saveTransactions();
+
+updateApp();
+
+
+alert(
+"All transactions deleted."
+);
+
+}
+);
+
+}
+
+
+/* ==========================================
+GOAL FORM
+========================================== */
 
 function setupGoalForm() {
 
@@ -1071,11 +1094,6 @@ const form =
 document.getElementById(
 "goalForm"
 );
-
-
-if (!form) {
-return;
-}
 
 
 form.addEventListener(
@@ -1138,15 +1156,10 @@ amount * 100
 
 saveGoal();
 
-
-updateGoalDisplay();
-
-
-form.reset();
-
+updateGoal();
 
 alert(
-"Savings goal saved successfully!"
+"Savings goal saved!"
 );
 
 }
@@ -1155,17 +1168,15 @@ alert(
 }
 
 
-// ============================================================
-// UPDATE GOAL DISPLAY
-// ============================================================
+/* ==========================================
+UPDATE GOAL
+========================================== */
 
-function updateGoalDisplay() {
+function updateGoal() {
 
 const totals =
 calculateTotals();
 
-
-// Current balance is used as savings
 
 const saved =
 Math.max(
@@ -1191,180 +1202,150 @@ savingsGoal.amount
 
 
 percent =
-Math.min(
-100,
 Math.max(
 0,
+Math.min(
+100,
 percent
 )
 );
 
 
-const roundedPercent =
+const rounded =
 Math.round(percent);
 
 
-// Dashboard
+/* DASHBOARD */
 
-const dashboardGoalName =
 document.getElementById(
 "dashboardGoalName"
-);
-
-
-const dashboardGoalAmount =
-document.getElementById(
-"dashboardGoalAmount"
-);
-
-
-const dashboardGoalPercent =
-document.getElementById(
-"dashboardGoalPercent"
-);
-
-
-const dashboardSaved =
-document.getElementById(
-"dashboardSaved"
-);
-
-
-const dashboardProgress =
-document.getElementById(
-"dashboardProgressBar"
-);
-
-
-if (dashboardGoalName) {
-
-dashboardGoalName.textContent =
-savingsGoal.name ||
-"Set a savings goal";
-
-}
-
-
-if (dashboardGoalAmount) {
-
-dashboardGoalAmount.textContent =
-"Goal: " +
-formatMoney(
-savingsGoal.amount
-);
-
-}
-
-
-if (dashboardGoalPercent) {
-
-dashboardGoalPercent.textContent =
-roundedPercent + "%";
-
-}
-
-
-if (dashboardSaved) {
-
-dashboardSaved.textContent =
-formatMoney(saved) +
-" saved";
-
-}
-
-
-if (dashboardProgress) {
-
-dashboardProgress.style.width =
-roundedPercent + "%";
-
-}
-
-
-// Goals page
-
-const goalDisplayName =
-document.getElementById(
-"goalDisplayName"
-);
-
-
-const goalTarget =
-document.getElementById(
-"goalTarget"
-);
-
-
-const goalPercent =
-document.getElementById(
-"goalPercent"
-);
-
-
-const goalSaved =
-document.getElementById(
-"goalSaved"
-);
-
-
-const goalProgress =
-document.getElementById(
-"goalProgressBar"
-);
-
-
-if (goalDisplayName) {
-
-goalDisplayName.textContent =
+).textContent =
 savingsGoal.name ||
 "No goal set";
 
+
+document.getElementById(
+"dashboardGoalPercent"
+).textContent =
+rounded + "%";
+
+
+document.getElementById(
+"dashboardSaved"
+).textContent =
+money(saved) +
+" saved";
+
+
+document.getElementById(
+"dashboardGoalAmount"
+).textContent =
+"Goal: " +
+money(
+savingsGoal.amount
+);
+
+
+document.getElementById(
+"dashboardProgressBar"
+).style.width =
+rounded + "%";
+
+
+/* GOALS PAGE */
+
+document.getElementById(
+"goalDisplayName"
+).textContent =
+savingsGoal.name ||
+"No goal set";
+
+
+document.getElementById(
+"goalPercent"
+).textContent =
+rounded + "%";
+
+
+document.getElementById(
+"goalSaved"
+).textContent =
+money(saved) +
+" saved";
+
+
+document.getElementById(
+"goalTarget"
+).textContent =
+"Goal: " +
+money(
+savingsGoal.amount
+);
+
+
+document.getElementById(
+"goalProgressBar"
+).style.width =
+rounded + "%";
+
+
+/* PUT CURRENT GOAL INTO FORM */
+
+document.getElementById(
+"goalName"
+).value =
+savingsGoal.name;
+
+
+document.getElementById(
+"goalAmount"
+).value =
+savingsGoal.amount || "";
+
 }
 
 
-if (goalTarget) {
+/* ==========================================
+DASHBOARD BUTTONS
+========================================== */
 
-goalTarget.textContent =
-"Goal: " +
-formatMoney(
-savingsGoal.amount
+function setupDashboardButtons() {
+
+document.getElementById(
+"dashboardViewAll"
+).addEventListener(
+"click",
+function () {
+
+showPage(
+"transactionsPage"
+);
+
+}
+);
+
+
+document.getElementById(
+"dashboardGoalButton"
+).addEventListener(
+"click",
+function () {
+
+showPage(
+"goalsPage"
+);
+
+}
 );
 
 }
 
 
-if (goalPercent) {
+/* ==========================================
+MONEY
+========================================== */
 
-goalPercent.textContent =
-roundedPercent + "%";
-
-}
-
-
-if (goalSaved) {
-
-goalSaved.textContent =
-formatMoney(saved) +
-" saved";
-
-}
-
-
-if (goalProgress) {
-
-goalProgress.style.width =
-roundedPercent + "%";
-
-}
-
-}
-
-
-// ============================================================
-// FORMAT MONEY
-// ============================================================
-
-function formatMoney(amount) {
+function money(value) {
 
 return new Intl.NumberFormat(
 "en-US",
@@ -1373,53 +1354,41 @@ style: "currency",
 currency: "USD"
 }
 ).format(
-Number(amount) || 0
+Number(value) || 0
 );
 
 }
 
 
-// ============================================================
-// FORMAT DATE
-// ============================================================
+/* ==========================================
+DATE
+========================================== */
 
-function formatDate(dateString) {
+function formatDate(value) {
 
-if (!dateString) {
-
+if (!value) {
 return "";
-
 }
 
 
 const parts =
-String(dateString).split("-");
+String(value).split("-");
 
 
-if (parts.length !== 3) {
+if (
+parts.length !== 3
+) {
 
-return dateString;
+return value;
 
 }
 
 
-const year =
-Number(parts[0]);
-
-
-const month =
-Number(parts[1]) - 1;
-
-
-const day =
-Number(parts[2]);
-
-
 const date =
 new Date(
-year,
-month,
-day
+Number(parts[0]),
+Number(parts[1]) - 1,
+Number(parts[2])
 );
 
 
@@ -1429,7 +1398,7 @@ date.getTime()
 )
 ) {
 
-return dateString;
+return value;
 
 }
 
@@ -1446,20 +1415,22 @@ year: "numeric"
 }
 
 
-// ============================================================
-// ESCAPE HTML
-// ============================================================
+/* ==========================================
+SECURITY HELPERS
+========================================== */
 
-function escapeHTML(text) {
+function escapeHTML(value) {
 
 const div =
-document.createElement("div");
+document.createElement(
+"div"
+);
 
 
 div.textContent =
-text == null
+value == null
 ? ""
-: String(text);
+: String(value);
 
 
 return div.innerHTML;
@@ -1467,15 +1438,24 @@ return div.innerHTML;
 }
 
 
-// ============================================================
-// ESCAPE ATTRIBUTE
-// ============================================================
-
 function escapeAttribute(value) {
 
 return String(value)
-.replace(/&/g, "&amp;")
-.replace(/"/g, "&quot;")
-.replace(/</g, "&lt;")
-.replace(/>/g, "&gt;");
+.replace(
+/&/g,
+"&amp;"
+)
+.replace(
+/"/g,
+"&quot;"
+)
+.replace(
+/</g,
+"&lt;"
+)
+.replace(
+/>/g,
+"&gt;"
+);
+
 }

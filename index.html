@@ -22,18 +22,22 @@ content="width=device-width, initial-scale=1.0, viewport-fit=cover"
 <div class="app">
 
 <header class="top-header">
+
 <div>
 <p class="small-label">WELCOME BACK</p>
 <h1>Money Tracker</h1>
 </div>
 
 <div class="header-icon">💰</div>
+
 </header>
 
 
 <main class="main-content">
 
-<!-- ================= DASHBOARD ================= -->
+<!-- ==================================================
+DASHBOARD
+================================================== -->
 
 <section id="dashboardPage" class="page active">
 
@@ -42,6 +46,9 @@ content="width=device-width, initial-scale=1.0, viewport-fit=cover"
 <p>Here's your financial summary.</p>
 </div>
 
+
+<!-- BALANCE -->
+
 <div class="balance-card">
 
 <div class="balance-top">
@@ -49,7 +56,9 @@ content="width=device-width, initial-scale=1.0, viewport-fit=cover"
 <span class="balance-icon">$</span>
 </div>
 
-<div id="balance" class="balance-amount">$0.00</div>
+<div id="balance" class="balance-amount">
+$0.00
+</div>
 
 <div class="balance-bottom">
 <span>Available balance</span>
@@ -58,32 +67,189 @@ content="width=device-width, initial-scale=1.0, viewport-fit=cover"
 </div>
 
 
+<!-- INCOME / EXPENSE -->
+
 <div class="summary-grid">
 
 <div class="summary-card">
-<div class="summary-icon income">↑</div>
+
+<div class="summary-icon income">
+↑
+</div>
 
 <div>
 <span>Income</span>
 <strong id="totalIncome">$0.00</strong>
 </div>
+
 </div>
 
+
 <div class="summary-card">
-<div class="summary-icon expense">↓</div>
+
+<div class="summary-icon expense">
+↓
+</div>
 
 <div>
 <span>Expenses</span>
 <strong id="totalExpenses">$0.00</strong>
 </div>
+
+</div>
+
+</div>
+
+
+<!-- PAYMENT TOTALS -->
+
+<div class="summary-grid payment-summary-grid">
+
+<div class="summary-card">
+
+<div class="summary-icon upcoming">
+📅
+</div>
+
+<div>
+<span>Upcoming Payments</span>
+<strong id="totalUpcomingPayments">$0.00</strong>
 </div>
 
 </div>
 
 
-<!-- UPCOMING SUMMARY -->
+<div class="summary-card">
+
+<div class="summary-icon recurring">
+🔁
+</div>
+
+<div>
+<span>Recurring Total</span>
+<strong id="totalRecurringPayments">$0.00</strong>
+</div>
+
+</div>
+
+</div>
+
+
+<!-- CHART -->
 
 <div class="section-title">
+
+<div>
+<h3>Income vs Expenses</h3>
+<p>Compare your money coming in and going out.</p>
+</div>
+
+</div>
+
+
+<div class="chart-card">
+
+<div class="chart-total-row">
+
+<div>
+<span class="chart-label">Income</span>
+<strong id="chartIncomeTotal">$0.00</strong>
+</div>
+
+<div>
+<span class="chart-label">Expenses</span>
+<strong id="chartExpenseTotal">$0.00</strong>
+</div>
+
+</div>
+
+<div class="bar-chart">
+
+<div class="chart-column">
+
+<span
+id="incomeBarValue"
+class="bar-value"
+>
+$0
+</span>
+
+<div class="bar-track">
+
+<div
+id="incomeBar"
+class="chart-bar income-bar"
+></div>
+
+</div>
+
+<span class="bar-label">
+Income
+</span>
+
+</div>
+
+
+<div class="chart-column">
+
+<span
+id="expenseBarValue"
+class="bar-value"
+>
+$0
+</span>
+
+<div class="bar-track">
+
+<div
+id="expenseBar"
+class="chart-bar expense-bar"
+></div>
+
+</div>
+
+<span class="bar-label">
+Expenses
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- CATEGORY CHART -->
+
+<div class="section-title">
+
+<div>
+<h3>Expense Breakdown</h3>
+<p>See where your expenses are going.</p>
+</div>
+
+</div>
+
+
+<div class="chart-card">
+
+<div
+id="categoryChart"
+class="category-chart"
+></div>
+
+<div
+id="categoryLegend"
+class="category-legend"
+></div>
+
+</div>
+
+
+<!-- UPCOMING -->
+
+<div class="section-title">
+
 <div>
 <h3>Upcoming Payments</h3>
 <p>Payments that need your attention.</p>
@@ -96,14 +262,20 @@ type="button"
 >
 See all
 </button>
+
 </div>
 
-<div id="dashboardUpcoming" class="transaction-list"></div>
+
+<div
+id="dashboardUpcoming"
+class="transaction-list"
+></div>
 
 
 <!-- SAVINGS -->
 
 <div class="section-title">
+
 <div>
 <h3>Savings Goal</h3>
 <p>Keep working toward your goal.</p>
@@ -116,6 +288,7 @@ type="button"
 >
 Edit
 </button>
+
 </div>
 
 
@@ -125,25 +298,39 @@ Edit
 
 <div>
 <span class="goal-label">Goal</span>
-<h3 id="dashboardGoalName">No goal set</h3>
+
+<h3 id="dashboardGoalName">
+No goal set
+</h3>
 </div>
 
-<strong id="dashboardGoalPercent">0%</strong>
+<strong id="dashboardGoalPercent">
+0%
+</strong>
 
 </div>
 
 
 <div class="progress-track">
+
 <div
 id="dashboardProgressBar"
 class="progress-fill"
 ></div>
+
 </div>
 
 
 <div class="goal-money">
-<span id="dashboardSaved">$0.00 saved</span>
-<span id="dashboardGoalAmount">Goal: $0.00</span>
+
+<span id="dashboardSaved">
+$0.00 saved
+</span>
+
+<span id="dashboardGoalAmount">
+Goal: $0.00
+</span>
+
 </div>
 
 </div>
@@ -177,13 +364,20 @@ class="transaction-list"
 </section>
 
 
-<!-- ================= ADD TRANSACTION ================= -->
+<!-- ==================================================
+ADD TRANSACTION
+================================================== -->
 
 <section id="addPage" class="page">
 
 <div class="page-heading">
+
 <h2>Add Transaction</h2>
-<p>Record your income or expense.</p>
+
+<p>
+Record your income or expense.
+</p>
+
 </div>
 
 
@@ -202,6 +396,7 @@ data-type="income"
 <span>↑</span>
 Income
 </button>
+
 
 <button
 type="button"
@@ -246,7 +441,10 @@ required
 Category
 </label>
 
-<select id="transactionCategory" required>
+<select
+id="transactionCategory"
+required
+>
 
 <option value="Salary">Salary</option>
 <option value="Business">Business</option>
@@ -321,7 +519,9 @@ Add Transaction
 </section>
 
 
-<!-- ================= TRANSACTIONS ================= -->
+<!-- ==================================================
+TRANSACTIONS
+================================================== -->
 
 <section id="transactionsPage" class="page">
 
@@ -361,7 +561,9 @@ class="transaction-list"
 </section>
 
 
-<!-- ================= PAYMENTS ================= -->
+<!-- ==================================================
+PAYMENTS
+================================================== -->
 
 <section id="paymentsPage" class="page">
 
@@ -372,6 +574,38 @@ class="transaction-list"
 <p>
 Manage bills and upcoming payments.
 </p>
+
+</div>
+
+
+<!-- PAYMENT TOTAL -->
+
+<div class="payment-total-card">
+
+<div>
+
+<span>
+Total Upcoming
+</span>
+
+<strong id="paymentsPageTotal">
+$0.00
+</strong>
+
+</div>
+
+
+<div>
+
+<span>
+Recurring
+</span>
+
+<strong id="paymentsPageRecurring">
+$0.00
+</strong>
+
+</div>
 
 </div>
 
@@ -465,10 +699,21 @@ Recurring
 
 <select id="paymentRecurring">
 
-<option value="none">One-time</option>
-<option value="weekly">Weekly</option>
-<option value="monthly">Monthly</option>
-<option value="yearly">Yearly</option>
+<option value="none">
+One-time
+</option>
+
+<option value="weekly">
+Weekly
+</option>
+
+<option value="monthly">
+Monthly
+</option>
+
+<option value="yearly">
+Yearly
+</option>
 
 </select>
 
@@ -490,8 +735,15 @@ Add Payment
 <div class="section-title payment-section-title">
 
 <div>
-<h3>Scheduled Payments</h3>
-<p>Your bills and recurring payments.</p>
+
+<h3>
+Scheduled Payments
+</h3>
+
+<p>
+Your bills and recurring payments.
+</p>
+
 </div>
 
 </div>
@@ -505,7 +757,9 @@ class="transaction-list"
 </section>
 
 
-<!-- ================= GOALS ================= -->
+<!-- ==================================================
+GOALS
+================================================== -->
 
 <section id="goalsPage" class="page">
 
@@ -582,6 +836,7 @@ Save Goal
 <div class="goal-row">
 
 <div>
+
 <span class="goal-label">
 Current goal
 </span>
@@ -589,6 +844,7 @@ Current goal
 <h3 id="goalDisplayName">
 No goal set
 </h3>
+
 </div>
 
 <strong id="goalPercent">
@@ -625,7 +881,9 @@ Goal: $0.00
 </section>
 
 
-<!-- ================= REPORTS ================= -->
+<!-- ==================================================
+REPORTS
+================================================== -->
 
 <section id="reportsPage" class="page">
 
@@ -700,7 +958,9 @@ Print / Save as PDF
 </main>
 
 
-<!-- ================= BOTTOM NAV ================= -->
+<!-- ==================================================
+BOTTOM NAV
+================================================== -->
 
 <nav class="bottom-nav">
 

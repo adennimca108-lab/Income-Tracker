@@ -11,6 +11,7 @@ padding: 0;
 
 
 :root {
+
 --dark: #102a2e;
 --dark-light: #183b40;
 
@@ -19,6 +20,12 @@ padding: 0;
 
 --red: #c84d4d;
 --red-light: #faeaea;
+
+--yellow: #b8860b;
+--yellow-light: #fff7dc;
+
+--blue: #356aa0;
+--blue-light: #eaf2fb;
 
 --background: #f5f7f7;
 --white: #ffffff;
@@ -38,6 +45,7 @@ min-height: 100%;
 
 
 body {
+
 min-height: 100vh;
 
 font-family:
@@ -70,8 +78,7 @@ button {
 
 .app {
 min-height: 100vh;
-
-padding-bottom: 90px;
+padding-bottom: 95px;
 }
 
 
@@ -80,6 +87,7 @@ HEADER
 ========================================== */
 
 .top-header {
+
 background: var(--dark);
 
 color: white;
@@ -98,6 +106,7 @@ align-items: center;
 
 
 .small-label {
+
 font-size: 11px;
 
 letter-spacing: 1.5px;
@@ -109,6 +118,7 @@ margin-bottom: 5px;
 
 
 .top-header h1 {
+
 font-size: 24px;
 
 font-weight: 750;
@@ -116,6 +126,7 @@ font-weight: 750;
 
 
 .header-icon {
+
 width: 46px;
 height: 46px;
 
@@ -137,6 +148,7 @@ MAIN
 ========================================== */
 
 .main-content {
+
 width: 100%;
 
 max-width: 700px;
@@ -153,6 +165,7 @@ display: none;
 
 
 .page.active {
+
 display: block;
 
 animation: pageIn 0.2s ease;
@@ -175,11 +188,13 @@ transform: translateY(0);
 
 
 .page-heading {
+
 margin-bottom: 22px;
 }
 
 
 .page-heading h2 {
+
 font-size: 27px;
 
 margin-bottom: 5px;
@@ -187,6 +202,7 @@ margin-bottom: 5px;
 
 
 .page-heading p {
+
 color: var(--muted);
 
 font-size: 14px;
@@ -200,6 +216,7 @@ BALANCE
 ========================================== */
 
 .balance-card {
+
 background: var(--dark);
 
 color: white;
@@ -215,6 +232,7 @@ margin-bottom: 15px;
 
 
 .balance-top {
+
 display: flex;
 
 justify-content: space-between;
@@ -228,6 +246,7 @@ font-size: 13px;
 
 
 .balance-icon {
+
 width: 32px;
 height: 32px;
 
@@ -245,6 +264,7 @@ font-weight: bold;
 
 
 .balance-amount {
+
 font-size: 35px;
 
 font-weight: 750;
@@ -256,6 +276,7 @@ margin: 18px 0;
 
 
 .balance-bottom {
+
 color: #a9bbbd;
 
 font-size: 12px;
@@ -267,6 +288,7 @@ SUMMARY
 ========================================== */
 
 .summary-grid {
+
 display: grid;
 
 grid-template-columns: 1fr 1fr;
@@ -278,6 +300,7 @@ margin-bottom: 28px;
 
 
 .summary-card {
+
 background: white;
 
 border: 1px solid var(--border);
@@ -297,6 +320,7 @@ box-shadow: var(--shadow);
 
 
 .summary-icon {
+
 width: 38px;
 height: 38px;
 
@@ -316,6 +340,7 @@ font-weight: bold;
 
 
 .summary-icon.income {
+
 background: var(--green-light);
 
 color: var(--green);
@@ -323,6 +348,7 @@ color: var(--green);
 
 
 .summary-icon.expense {
+
 background: var(--red-light);
 
 color: var(--red);
@@ -330,6 +356,7 @@ color: var(--red);
 
 
 .summary-card span {
+
 display: block;
 
 font-size: 12px;
@@ -341,6 +368,7 @@ margin-bottom: 4px;
 
 
 .summary-card strong {
+
 display: block;
 
 font-size: 17px;
@@ -362,6 +390,7 @@ SECTION TITLE
 ========================================== */
 
 .section-title {
+
 display: flex;
 
 justify-content: space-between;
@@ -372,11 +401,12 @@ gap: 10px;
 
 margin-bottom: 12px;
 
-margin-top: 5px;
+margin-top: 25px;
 }
 
 
 .section-title h3 {
+
 font-size: 18px;
 
 margin-bottom: 3px;
@@ -384,6 +414,7 @@ margin-bottom: 3px;
 
 
 .section-title p {
+
 font-size: 12px;
 
 color: var(--muted);
@@ -391,6 +422,7 @@ color: var(--muted);
 
 
 .text-button {
+
 border: none;
 
 background: none;
@@ -412,6 +444,7 @@ GOAL
 ========================================== */
 
 .goal-card {
+
 background: white;
 
 border: 1px solid var(--border);
@@ -427,6 +460,7 @@ margin-bottom: 27px;
 
 
 .goal-row {
+
 display: flex;
 
 justify-content: space-between;
@@ -438,6 +472,7 @@ gap: 15px;
 
 
 .goal-label {
+
 display: block;
 
 color: var(--muted);
@@ -453,6 +488,7 @@ margin-bottom: 5px;
 
 
 .goal-row h3 {
+
 font-size: 18px;
 
 overflow-wrap: anywhere;
@@ -460,6 +496,7 @@ overflow-wrap: anywhere;
 
 
 .goal-row strong {
+
 font-size: 25px;
 
 color: var(--green);
@@ -467,6 +504,7 @@ color: var(--green);
 
 
 .progress-track {
+
 width: 100%;
 
 height: 10px;
@@ -482,6 +520,7 @@ margin-top: 20px;
 
 
 .progress-fill {
+
 width: 0%;
 
 height: 100%;
@@ -495,6 +534,7 @@ transition: width 0.35s ease;
 
 
 .goal-money {
+
 display: flex;
 
 justify-content: space-between;
@@ -519,6 +559,7 @@ TRANSACTION LIST
 ========================================== */
 
 .transaction-list {
+
 background: white;
 
 border: 1px solid var(--border);
@@ -532,6 +573,7 @@ box-shadow: var(--shadow);
 
 
 .transaction {
+
 padding: 16px;
 
 display: flex;
@@ -552,6 +594,7 @@ border-bottom: none;
 
 
 .transaction-left {
+
 display: flex;
 
 align-items: center;
@@ -563,6 +606,7 @@ min-width: 0;
 
 
 .transaction-icon {
+
 width: 43px;
 height: 43px;
 
@@ -580,6 +624,7 @@ font-size: 19px;
 
 
 .transaction-icon.income {
+
 background: var(--green-light);
 
 color: var(--green);
@@ -587,6 +632,7 @@ color: var(--green);
 
 
 .transaction-icon.expense {
+
 background: var(--red-light);
 
 color: var(--red);
@@ -594,6 +640,7 @@ color: var(--red);
 
 
 .transaction-name {
+
 font-weight: 700;
 
 font-size: 14px;
@@ -605,6 +652,7 @@ overflow-wrap: anywhere;
 
 
 .transaction-details {
+
 color: var(--muted);
 
 font-size: 11px;
@@ -612,6 +660,7 @@ font-size: 11px;
 
 
 .transaction-right {
+
 display: flex;
 
 align-items: center;
@@ -623,6 +672,7 @@ flex-shrink: 0;
 
 
 .transaction-amount {
+
 font-weight: 750;
 
 font-size: 14px;
@@ -642,6 +692,7 @@ color: var(--red);
 
 
 .delete-button {
+
 border: none;
 
 background: var(--red-light);
@@ -661,6 +712,7 @@ cursor: pointer;
 
 
 .empty-state {
+
 text-align: center;
 
 padding: 35px 20px;
@@ -674,10 +726,11 @@ line-height: 1.6;
 
 
 /* ==========================================
-FORM CARD
+FORMS
 ========================================== */
 
 .form-card {
+
 background: white;
 
 border: 1px solid var(--border);
@@ -696,6 +749,7 @@ margin-bottom: 18px;
 
 
 .form-field label {
+
 display: block;
 
 font-size: 13px;
@@ -708,6 +762,7 @@ margin-bottom: 8px;
 
 .form-field input,
 .form-field select {
+
 width: 100%;
 
 height: 54px;
@@ -725,23 +780,26 @@ padding: 0 14px;
 font-size: 16px;
 
 outline: none;
-
-appearance: auto;
 }
 
 
 .form-field input:focus,
 .form-field select:focus {
+
 border-color: var(--green);
+
+box-shadow: 0 0 0 3px var(--green-light);
 }
 
 
 .money-input {
+
 position: relative;
 }
 
 
 .money-input span {
+
 position: absolute;
 
 left: 15px;
@@ -761,6 +819,7 @@ pointer-events: none;
 
 
 .money-input input {
+
 padding-left: 37px !important;
 }
 
@@ -770,6 +829,7 @@ TYPE SELECTOR
 ========================================== */
 
 .type-selector {
+
 display: grid;
 
 grid-template-columns: 1fr 1fr;
@@ -781,6 +841,7 @@ margin-bottom: 22px;
 
 
 .type-button {
+
 height: 52px;
 
 border-radius: 13px;
@@ -811,6 +872,7 @@ font-size: 18px;
 
 
 .type-button.selected-income {
+
 background: var(--green-light);
 
 border-color: var(--green);
@@ -820,6 +882,7 @@ color: var(--green);
 
 
 .type-button.selected-expense {
+
 background: var(--red-light);
 
 border-color: var(--red);
@@ -829,13 +892,14 @@ color: var(--red);
 
 
 /* ==========================================
-MAIN BUTTON
+BUTTONS
 ========================================== */
 
 .main-button {
+
 width: 100%;
 
-height: 56px;
+min-height: 56px;
 
 border: none;
 
@@ -863,34 +927,16 @@ transform: scale(0.98);
 }
 
 
-.main-button:disabled {
-opacity: 0.6;
+.secondary-button {
 
-cursor: not-allowed;
-}
+margin-top: 18px;
 
-
-/* ==========================================
-TRANSACTION HEADER
-========================================== */
-
-.transaction-header {
-display: flex;
-
-justify-content: space-between;
-
-align-items: center;
-
-margin-bottom: 12px;
-}
-
-
-.transaction-header strong {
-font-size: 14px;
+background: var(--dark);
 }
 
 
 .clear-button {
+
 border: none;
 
 background: var(--red-light);
@@ -910,17 +956,359 @@ cursor: pointer;
 
 
 /* ==========================================
-BOTTOM NAVIGATION
+TRANSACTION HEADER
+========================================== */
+
+.transaction-header {
+
+display: flex;
+
+justify-content: space-between;
+
+align-items: center;
+
+margin-bottom: 12px;
+}
+
+
+.transaction-header strong {
+font-size: 14px;
+}
+
+
+/* ==========================================
+PAYMENT STATUS
+========================================== */
+
+.payment-row {
+
+padding: 16px;
+
+border-bottom: 1px solid var(--border);
+
+display: flex;
+
+justify-content: space-between;
+
+gap: 12px;
+}
+
+
+.payment-row:last-child {
+border-bottom: none;
+}
+
+
+.payment-left {
+
+display: flex;
+
+gap: 12px;
+
+min-width: 0;
+}
+
+
+.payment-icon {
+
+width: 43px;
+height: 43px;
+
+min-width: 43px;
+
+border-radius: 13px;
+
+background: var(--blue-light);
+
+display: flex;
+
+justify-content: center;
+align-items: center;
+
+font-size: 19px;
+}
+
+
+.payment-name {
+
+font-weight: 700;
+
+font-size: 14px;
+
+margin-bottom: 4px;
+
+overflow-wrap: anywhere;
+}
+
+
+.payment-details {
+
+color: var(--muted);
+
+font-size: 11px;
+
+line-height: 1.5;
+}
+
+
+.payment-right {
+
+display: flex;
+
+flex-direction: column;
+
+align-items: flex-end;
+
+gap: 6px;
+
+flex-shrink: 0;
+}
+
+
+.payment-amount {
+
+font-weight: 750;
+
+font-size: 14px;
+}
+
+
+.status {
+
+display: inline-block;
+
+padding: 5px 8px;
+
+border-radius: 8px;
+
+font-size: 10px;
+
+font-weight: 750;
+
+white-space: nowrap;
+}
+
+
+.status.upcoming {
+
+color: var(--yellow);
+
+background: var(--yellow-light);
+}
+
+
+.status.overdue {
+
+color: var(--red);
+
+background: var(--red-light);
+}
+
+
+.status.paid {
+
+color: var(--green);
+
+background: var(--green-light);
+}
+
+
+.payment-actions {
+
+display: flex;
+
+gap: 5px;
+}
+
+
+.small-action {
+
+border: none;
+
+border-radius: 7px;
+
+padding: 6px 8px;
+
+font-size: 10px;
+
+font-weight: 700;
+
+cursor: pointer;
+}
+
+
+.paid-button {
+
+background: var(--green-light);
+
+color: var(--green);
+}
+
+
+.remove-button {
+
+background: var(--red-light);
+
+color: var(--red);
+}
+
+
+/* ==========================================
+REPORT
+========================================== */
+
+.report-card {
+
+background: white;
+
+border: 1px solid var(--border);
+
+border-radius: 20px;
+
+box-shadow: var(--shadow);
+
+margin-top: 22px;
+
+overflow: hidden;
+
+display: none;
+}
+
+
+.report-card.visible {
+display: block;
+}
+
+
+.report-header {
+
+background: var(--dark);
+
+color: white;
+
+padding: 22px;
+
+}
+
+
+.report-header h3 {
+
+font-size: 20px;
+
+margin-bottom: 5px;
+}
+
+
+.report-header p {
+
+font-size: 12px;
+
+opacity: 0.75;
+}
+
+
+.report-summary {
+
+display: grid;
+
+grid-template-columns: 1fr 1fr;
+
+gap: 1px;
+
+background: var(--border);
+}
+
+
+.report-stat {
+
+background: white;
+
+padding: 16px;
+}
+
+
+.report-stat span {
+
+display: block;
+
+color: var(--muted);
+
+font-size: 11px;
+
+margin-bottom: 5px;
+}
+
+
+.report-stat strong {
+font-size: 16px;
+}
+
+
+.report-stat.income strong {
+color: var(--green);
+}
+
+
+.report-stat.expense strong {
+color: var(--red);
+}
+
+
+.report-section {
+
+padding: 18px;
+
+border-top: 1px solid var(--border);
+}
+
+
+.report-section h4 {
+
+font-size: 15px;
+
+margin-bottom: 12px;
+}
+
+
+.report-line {
+
+display: flex;
+
+justify-content: space-between;
+
+gap: 10px;
+
+padding: 9px 0;
+
+border-bottom: 1px solid var(--border);
+
+font-size: 12px;
+}
+
+
+.report-line:last-child {
+border-bottom: none;
+}
+
+
+.report-line span:last-child {
+font-weight: 700;
+}
+
+
+/* ==========================================
+BOTTOM NAV
 ========================================== */
 
 .bottom-nav {
+
 position: fixed;
 
 bottom: 0;
 left: 0;
 right: 0;
 
-height: calc(
+min-height: calc(
 70px + env(safe-area-inset-bottom)
 );
 
@@ -938,13 +1326,14 @@ border-top: 1px solid var(--border);
 display: grid;
 
 grid-template-columns:
-repeat(4, 1fr);
+repeat(6, 1fr);
 
 z-index: 100;
 }
 
 
 .bottom-nav-button {
+
 border: none;
 
 background: transparent;
@@ -963,14 +1352,19 @@ gap: 4px;
 
 cursor: pointer;
 
-font-size: 20px;
+font-size: 18px;
+
+min-width: 0;
 }
 
 
 .bottom-nav-button small {
-font-size: 10px;
+
+font-size: 9px;
 
 font-weight: 700;
+
+white-space: nowrap;
 }
 
 
@@ -980,6 +1374,7 @@ color: var(--green);
 
 
 .add-circle {
+
 width: 34px;
 height: 34px;
 
@@ -1022,31 +1417,35 @@ padding-bottom: 0;
 
 
 .top-header {
+
 padding: 28px 30px;
 }
 
 
 .top-header > * {
 width: min(1100px, 100%);
-
 }
 
 
 .main-content {
+
 max-width: 1100px;
 
-padding: 35px 25px 60px;
+padding:
+35px 25px 60px;
 }
 
 
 .bottom-nav {
+
 position: static;
 
 max-width: 1100px;
 
-height: auto;
+min-height: auto;
 
-margin: 0 auto 35px;
+margin:
+0 auto 35px;
 
 padding: 0;
 
@@ -1065,13 +1464,14 @@ backdrop-filter: none;
 
 
 .bottom-nav-button {
+
 background: white;
 
 border: 1px solid var(--border);
 
 border-radius: 12px;
 
-padding: 10px 20px;
+padding: 10px 16px;
 
 flex-direction: row;
 
@@ -1082,6 +1482,7 @@ box-shadow: var(--shadow);
 
 
 .bottom-nav-button.active {
+
 background: var(--green);
 
 color: white;
@@ -1089,6 +1490,7 @@ color: white;
 
 
 .add-circle {
+
 width: auto;
 height: auto;
 
@@ -1103,7 +1505,9 @@ margin: 0;
 
 
 .summary-grid {
-grid-template-columns: 1fr 1fr;
+
+grid-template-columns:
+1fr 1fr;
 
 max-width: 700px;
 }
@@ -1128,6 +1532,11 @@ max-width: 700px;
 max-width: 800px;
 }
 
+
+.report-card {
+max-width: 800px;
+}
+
 }
 
 
@@ -1135,16 +1544,19 @@ max-width: 800px;
 VERY SMALL PHONES
 ========================================== */
 
-@media (max-width: 360px) {
+@media (max-width: 380px) {
 
 .main-content {
+
 padding-left: 12px;
 padding-right: 12px;
 }
 
 
 .summary-card {
-padding: 13px 11px;
+
+padding:
+13px 11px;
 }
 
 
@@ -1154,7 +1566,9 @@ font-size: 15px;
 
 
 .transaction {
-padding: 14px 12px;
+
+padding:
+14px 12px;
 }
 
 
@@ -1164,7 +1578,70 @@ font-size: 13px;
 
 
 .delete-button {
-padding: 6px 7px;
+
+padding:
+6px 7px;
+}
+
+
+.bottom-nav-button small {
+font-size: 8px;
+}
+
+
+.bottom-nav-button {
+font-size: 16px;
+}
+
+}
+
+
+/* ==========================================
+PRINT / PDF
+========================================== */
+
+@media print {
+
+body {
+background: white;
+}
+
+
+.top-header,
+.bottom-nav,
+.page-heading,
+.form-card,
+.secondary-button {
+display: none !important;
+}
+
+
+.main-content {
+max-width: none;
+padding: 0;
+}
+
+
+.page {
+display: none !important;
+}
+
+
+#reportsPage {
+display: block !important;
+}
+
+
+#reportContainer {
+display: block !important;
+box-shadow: none;
+border: none;
+margin: 0;
+}
+
+
+.report-card {
+box-shadow: none;
 }
 
 }

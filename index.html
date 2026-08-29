@@ -1,15 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+>
 
 <title>Financial Tracker</title>
 
-<link rel="stylesheet" href="style.css">
+<link
+rel="stylesheet"
+href="style.css"
+>
+
 </head>
 
+
 <body>
+
 
 <!-- =========================================================
 HEADER
@@ -23,6 +35,7 @@ HEADER
 💰 Financial Tracker
 </div>
 
+
 <nav class="navigation">
 
 <button
@@ -33,6 +46,7 @@ data-page="dashboard"
 Dashboard
 </button>
 
+
 <button
 type="button"
 class="nav-btn"
@@ -40,6 +54,7 @@ data-page="transactions"
 >
 Transactions
 </button>
+
 
 <button
 type="button"
@@ -54,6 +69,7 @@ Savings Goals
 </div>
 
 </header>
+
 
 
 <!-- =========================================================
@@ -74,7 +90,9 @@ class="page active-page"
 
 <div class="page-header">
 
-<h1>Dashboard</h1>
+<h1>
+Dashboard
+</h1>
 
 <p>
 Keep track of your money and savings.
@@ -83,9 +101,13 @@ Keep track of your money and savings.
 </div>
 
 
+
 <!-- SUMMARY CARDS -->
 
 <div class="summary-grid">
+
+
+<!-- INCOME -->
 
 <div class="summary-card">
 
@@ -107,6 +129,9 @@ $0.00
 </div>
 
 
+
+<!-- EXPENSES -->
+
 <div class="summary-card">
 
 <div class="summary-icon">
@@ -127,6 +152,9 @@ $0.00
 </div>
 
 
+
+<!-- BALANCE -->
+
 <div class="summary-card">
 
 <div class="summary-icon">
@@ -146,10 +174,14 @@ $0.00
 
 </div>
 
+
 </div>
 
 
-<!-- SAVINGS GOAL -->
+
+<!-- =====================================================
+DASHBOARD SAVINGS GOAL
+====================================================== -->
 
 <div class="card">
 
@@ -157,19 +189,18 @@ $0.00
 
 <div>
 
-<h2>Savings Goal</h2>
+<h2>
+Savings Goal
+</h2>
 
-<p
-id="dashboardGoalName"
->
+<p id="dashboardGoalName">
 Set a savings goal
 </p>
 
 </div>
 
-<strong
-id="dashboardGoalPercent"
->
+
+<strong id="dashboardGoalPercent">
 0%
 </strong>
 
@@ -202,13 +233,19 @@ Goal: $0.00
 </div>
 
 
-<!-- RECENT TRANSACTIONS -->
+
+<!-- =====================================================
+RECENT TRANSACTIONS
+====================================================== -->
 
 <div class="card">
 
 <div class="card-header">
 
-<h2>Recent Transactions</h2>
+<h2>
+Recent Transactions
+</h2>
+
 
 <button
 type="button"
@@ -234,7 +271,9 @@ No transactions yet.
 
 </div>
 
+
 </section>
+
 
 
 <!-- =========================================================
@@ -248,7 +287,9 @@ class="page"
 
 <div class="page-header">
 
-<h1>Transactions</h1>
+<h1>
+Transactions
+</h1>
 
 <p>
 Add and manage your income and expenses.
@@ -257,11 +298,16 @@ Add and manage your income and expenses.
 </div>
 
 
-<!-- ADD TRANSACTION -->
+
+<!-- =====================================================
+ADD TRANSACTION
+====================================================== -->
 
 <div class="card">
 
-<h2>Add Transaction</h2>
+<h2>
+Add Transaction
+</h2>
 
 
 <form
@@ -269,13 +315,17 @@ id="transactionForm"
 class="transaction-form"
 >
 
+
 <!-- TYPE -->
 
 <div class="form-group">
 
-<label for="transactionType">
+<label
+for="transactionType"
+>
 Transaction Type
 </label>
+
 
 <select
 id="transactionType"
@@ -296,13 +346,17 @@ Expense
 </div>
 
 
+
 <!-- DESCRIPTION -->
 
 <div class="form-group">
 
-<label for="transactionName">
+<label
+for="transactionName"
+>
 Description
 </label>
+
 
 <input
 type="text"
@@ -315,13 +369,17 @@ required
 </div>
 
 
+
 <!-- CATEGORY -->
 
 <div class="form-group">
 
-<label for="transactionCategory">
+<label
+for="transactionCategory"
+>
 Category
 </label>
+
 
 <select
 id="transactionCategory"
@@ -370,13 +428,19 @@ Other
 </div>
 
 
-<!-- AMOUNT -->
+
+<!-- =================================================
+AMOUNT
+================================================== -->
 
 <div class="form-group">
 
-<label for="transactionAmount">
+<label
+for="transactionAmount"
+>
 Amount
 </label>
+
 
 <input
 type="number"
@@ -391,7 +455,10 @@ required
 </div>
 
 
-<!-- BUTTON -->
+
+<!-- =================================================
+ADD BUTTON
+================================================== -->
 
 <button
 type="submit"
@@ -400,12 +467,16 @@ class="primary-btn"
 Add Transaction
 </button>
 
+
 </form>
 
 </div>
 
 
-<!-- ALL TRANSACTIONS -->
+
+<!-- =====================================================
+ALL TRANSACTIONS
+====================================================== -->
 
 <div class="card">
 
@@ -413,7 +484,9 @@ Add Transaction
 
 <div>
 
-<h2>All Transactions</h2>
+<h2>
+All Transactions
+</h2>
 
 <p>
 Your transaction history
@@ -433,22 +506,29 @@ Clear All
 </div>
 
 
+
 <div
 id="allTransactions"
 class="transactions-list"
 >
 
 <div class="empty">
+
 No transactions yet.
+
 <br>
+
 Add your first transaction above.
-</div>
 
 </div>
 
 </div>
+
+</div>
+
 
 </section>
+
 
 
 <!-- =========================================================
@@ -462,7 +542,9 @@ class="page"
 
 <div class="page-header">
 
-<h1>Savings Goals</h1>
+<h1>
+Savings Goals
+</h1>
 
 <p>
 Set a goal and track your progress.
@@ -471,11 +553,16 @@ Set a goal and track your progress.
 </div>
 
 
-<!-- GOAL FORM -->
+
+<!-- =====================================================
+GOAL FORM
+====================================================== -->
 
 <div class="card">
 
-<h2>Create Savings Goal</h2>
+<h2>
+Create Savings Goal
+</h2>
 
 
 <form
@@ -483,11 +570,17 @@ id="goalForm"
 class="goal-form"
 >
 
+
+<!-- GOAL NAME -->
+
 <div class="form-group">
 
-<label for="goalName">
+<label
+for="goalName"
+>
 Goal Name
 </label>
+
 
 <input
 type="text"
@@ -500,11 +593,17 @@ required
 </div>
 
 
+
+<!-- GOAL AMOUNT -->
+
 <div class="form-group">
 
-<label for="goalAmount">
+<label
+for="goalAmount"
+>
 Goal Amount
 </label>
+
 
 <input
 type="number"
@@ -519,6 +618,9 @@ required
 </div>
 
 
+
+<!-- SAVE GOAL -->
+
 <button
 type="submit"
 class="primary-btn"
@@ -526,12 +628,16 @@ class="primary-btn"
 Save Savings Goal
 </button>
 
+
 </form>
 
 </div>
 
 
-<!-- CURRENT GOAL -->
+
+<!-- =====================================================
+CURRENT GOAL
+====================================================== -->
 
 <div class="card">
 
@@ -557,6 +663,7 @@ Goal: $0.00
 </div>
 
 
+
 <div class="progress-container">
 
 <div
@@ -568,13 +675,15 @@ style="width: 0%;"
 </div>
 
 
+
 <div class="goal-footer">
 
 <span id="goalSaved">
 $0.00 saved
 </span>
 
-<span id="goalTarget">
+
+<span id="goalTargetBottom">
 Goal: $0.00
 </span>
 
@@ -582,10 +691,12 @@ Goal: $0.00
 
 </div>
 
+
 </section>
 
 
 </main>
+
 
 
 <!-- =========================================================
@@ -601,19 +712,26 @@ Financial Tracker
 </footer>
 
 
-<!-- =========================================================
-SUPABASE
-========================================================= -->
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 
 <!-- =========================================================
-YOUR JAVASCRIPT
+SUPABASE JAVASCRIPT LIBRARY
 ========================================================= -->
 
-<script src="script.js"></script>
+<script
+src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+></script>
+
+
+
+<!-- =========================================================
+YOUR SCRIPT
+========================================================= -->
+
+<script
+src="script.js"
+></script>
 
 
 </body>
+
 </html>

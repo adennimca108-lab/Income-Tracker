@@ -8,20 +8,9 @@ name="viewport"
 content="width=device-width, initial-scale=1.0, viewport-fit=cover"
 >
 
-<meta
-name="theme-color"
-content="#102a2e"
->
-
-<meta
-name="apple-mobile-web-app-capable"
-content="yes"
->
-
-<meta
-name="apple-mobile-web-app-status-bar-style"
-content="black-translucent"
->
+<meta name="theme-color" content="#102a2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <title>Money Tracker</title>
 
@@ -30,138 +19,91 @@ content="black-translucent"
 
 <body>
 
-<!-- APP -->
-
 <div class="app">
 
-<!-- HEADER -->
-
 <header class="top-header">
-
 <div>
 <p class="small-label">WELCOME BACK</p>
-
 <h1>Money Tracker</h1>
 </div>
 
-<div class="header-icon">
-💰
-</div>
-
+<div class="header-icon">💰</div>
 </header>
 
 
-<!-- MAIN CONTENT -->
-
 <main class="main-content">
 
+<!-- ================= DASHBOARD ================= -->
 
-<!-- ============================= -->
-<!-- DASHBOARD -->
-<!-- ============================= -->
-
-<section
-id="dashboardPage"
-class="page active"
->
+<section id="dashboardPage" class="page active">
 
 <div class="page-heading">
-
-<div>
 <h2>Overview</h2>
-
-<p>
-Here's your financial summary.
-</p>
+<p>Here's your financial summary.</p>
 </div>
-
-</div>
-
-
-<!-- BALANCE -->
 
 <div class="balance-card">
 
 <div class="balance-top">
-
 <span>Total Balance</span>
-
-<span class="balance-icon">
-$
-</span>
-
+<span class="balance-icon">$</span>
 </div>
 
-<div
-id="balance"
-class="balance-amount"
->
-$0.00
-</div>
+<div id="balance" class="balance-amount">$0.00</div>
 
 <div class="balance-bottom">
-
-<span>
-Available balance
-</span>
-
+<span>Available balance</span>
 </div>
 
 </div>
 
-
-<!-- SUMMARY -->
 
 <div class="summary-grid">
 
 <div class="summary-card">
-
-<div class="summary-icon income">
-↑
-</div>
+<div class="summary-icon income">↑</div>
 
 <div>
-
-<span>
-Income
-</span>
-
-<strong id="totalIncome">
-$0.00
-</strong>
-
+<span>Income</span>
+<strong id="totalIncome">$0.00</strong>
 </div>
-
 </div>
-
 
 <div class="summary-card">
-
-<div class="summary-icon expense">
-↓
-</div>
+<div class="summary-icon expense">↓</div>
 
 <div>
-
-<span>
-Expenses
-</span>
-
-<strong id="totalExpenses">
-$0.00
-</strong>
-
+<span>Expenses</span>
+<strong id="totalExpenses">$0.00</strong>
+</div>
 </div>
 
 </div>
 
+
+<!-- UPCOMING SUMMARY -->
+
+<div class="section-title">
+<div>
+<h3>Upcoming Payments</h3>
+<p>Payments that need your attention.</p>
 </div>
+
+<button
+id="dashboardPaymentsButton"
+class="text-button"
+type="button"
+>
+See all
+</button>
+</div>
+
+<div id="dashboardUpcoming" class="transaction-list"></div>
 
 
 <!-- SAVINGS -->
 
 <div class="section-title">
-
 <div>
 <h3>Savings Goal</h3>
 <p>Keep working toward your goal.</p>
@@ -174,7 +116,6 @@ type="button"
 >
 Edit
 </button>
-
 </div>
 
 
@@ -183,44 +124,26 @@ Edit
 <div class="goal-row">
 
 <div>
-
-<span class="goal-label">
-Goal
-</span>
-
-<h3 id="dashboardGoalName">
-No goal set
-</h3>
-
+<span class="goal-label">Goal</span>
+<h3 id="dashboardGoalName">No goal set</h3>
 </div>
 
-<strong id="dashboardGoalPercent">
-0%
-</strong>
+<strong id="dashboardGoalPercent">0%</strong>
 
 </div>
 
 
 <div class="progress-track">
-
 <div
 id="dashboardProgressBar"
 class="progress-fill"
 ></div>
-
 </div>
 
 
 <div class="goal-money">
-
-<span id="dashboardSaved">
-$0.00 saved
-</span>
-
-<span id="dashboardGoalAmount">
-Goal: $0.00
-</span>
-
+<span id="dashboardSaved">$0.00 saved</span>
+<span id="dashboardGoalAmount">Goal: $0.00</span>
 </div>
 
 </div>
@@ -254,32 +177,19 @@ class="transaction-list"
 </section>
 
 
-<!-- ============================= -->
-<!-- ADD TRANSACTION -->
-<!-- ============================= -->
+<!-- ================= ADD TRANSACTION ================= -->
 
-<section
-id="addPage"
-class="page"
->
+<section id="addPage" class="page">
 
 <div class="page-heading">
-
 <h2>Add Transaction</h2>
-
-<p>
-Record your income or expense.
-</p>
-
+<p>Record your income or expense.</p>
 </div>
 
 
 <div class="form-card">
 
 <form id="transactionForm">
-
-
-<!-- TYPE -->
 
 <div class="type-selector">
 
@@ -306,16 +216,12 @@ Expense
 </div>
 
 
-<!-- HIDDEN TYPE -->
-
 <input
 type="hidden"
 id="transactionType"
 value="income"
 >
 
-
-<!-- DESCRIPTION -->
 
 <div class="form-field">
 
@@ -334,73 +240,31 @@ required
 </div>
 
 
-<!-- CATEGORY -->
-
 <div class="form-field">
 
 <label for="transactionCategory">
 Category
 </label>
 
-<select
-id="transactionCategory"
-required
->
+<select id="transactionCategory" required>
 
-<option value="Salary">
-Salary
-</option>
-
-<option value="Business">
-Business
-</option>
-
-<option value="Freelance">
-Freelance
-</option>
-
-<option value="Gift">
-Gift
-</option>
-
-<option value="Food">
-Food
-</option>
-
-<option value="Transport">
-Transport
-</option>
-
-<option value="Shopping">
-Shopping
-</option>
-
-<option value="Bills">
-Bills
-</option>
-
-<option value="Entertainment">
-Entertainment
-</option>
-
-<option value="Health">
-Health
-</option>
-
-<option value="Education">
-Education
-</option>
-
-<option value="Other">
-Other
-</option>
+<option value="Salary">Salary</option>
+<option value="Business">Business</option>
+<option value="Freelance">Freelance</option>
+<option value="Gift">Gift</option>
+<option value="Food">Food</option>
+<option value="Transport">Transport</option>
+<option value="Shopping">Shopping</option>
+<option value="Bills">Bills</option>
+<option value="Entertainment">Entertainment</option>
+<option value="Health">Health</option>
+<option value="Education">Education</option>
+<option value="Other">Other</option>
 
 </select>
 
 </div>
 
-
-<!-- AMOUNT -->
 
 <div class="form-field">
 
@@ -427,8 +291,6 @@ required
 </div>
 
 
-<!-- DATE -->
-
 <div class="form-field">
 
 <label for="transactionDate">
@@ -443,8 +305,6 @@ required
 
 </div>
 
-
-<!-- ADD -->
 
 <button
 id="addTransactionButton"
@@ -461,18 +321,11 @@ Add Transaction
 </section>
 
 
-<!-- ============================= -->
-<!-- TRANSACTIONS -->
-<!-- ============================= -->
+<!-- ================= TRANSACTIONS ================= -->
 
-<section
-id="transactionsPage"
-class="page"
->
+<section id="transactionsPage" class="page">
 
 <div class="page-heading">
-
-<div>
 
 <h2>Transactions</h2>
 
@@ -482,18 +335,12 @@ Your complete transaction history.
 
 </div>
 
-</div>
-
 
 <div class="transaction-header">
-
-<div>
 
 <strong id="transactionCount">
 0 transactions
 </strong>
-
-</div>
 
 <button
 id="clearAllButton"
@@ -514,14 +361,153 @@ class="transaction-list"
 </section>
 
 
-<!-- ============================= -->
-<!-- GOALS -->
-<!-- ============================= -->
+<!-- ================= PAYMENTS ================= -->
 
-<section
-id="goalsPage"
-class="page"
+<section id="paymentsPage" class="page">
+
+<div class="page-heading">
+
+<h2>Payments</h2>
+
+<p>
+Manage bills and upcoming payments.
+</p>
+
+</div>
+
+
+<div class="form-card">
+
+<form id="paymentForm">
+
+<div class="form-field">
+
+<label for="paymentName">
+Payment name
+</label>
+
+<input
+id="paymentName"
+type="text"
+placeholder="e.g. Rent"
+required
 >
+
+</div>
+
+
+<div class="form-field">
+
+<label for="paymentAmount">
+Amount
+</label>
+
+<div class="money-input">
+
+<span>$</span>
+
+<input
+id="paymentAmount"
+type="number"
+min="0.01"
+step="0.01"
+placeholder="0.00"
+inputmode="decimal"
+required
+>
+
+</div>
+
+</div>
+
+
+<div class="form-field">
+
+<label for="paymentDueDate">
+Due date
+</label>
+
+<input
+id="paymentDueDate"
+type="date"
+required
+>
+
+</div>
+
+
+<div class="form-field">
+
+<label for="paymentCategory">
+Category
+</label>
+
+<select id="paymentCategory">
+
+<option value="Bills">Bills</option>
+<option value="Rent">Rent</option>
+<option value="Utilities">Utilities</option>
+<option value="Subscription">Subscription</option>
+<option value="Loan">Loan</option>
+<option value="Insurance">Insurance</option>
+<option value="Other">Other</option>
+
+</select>
+
+</div>
+
+
+<div class="form-field">
+
+<label for="paymentRecurring">
+Recurring
+</label>
+
+<select id="paymentRecurring">
+
+<option value="none">One-time</option>
+<option value="weekly">Weekly</option>
+<option value="monthly">Monthly</option>
+<option value="yearly">Yearly</option>
+
+</select>
+
+</div>
+
+
+<button
+type="submit"
+class="main-button"
+>
+Add Payment
+</button>
+
+</form>
+
+</div>
+
+
+<div class="section-title payment-section-title">
+
+<div>
+<h3>Scheduled Payments</h3>
+<p>Your bills and recurring payments.</p>
+</div>
+
+</div>
+
+
+<div
+id="paymentsList"
+class="transaction-list"
+></div>
+
+</section>
+
+
+<!-- ================= GOALS ================= -->
+
+<section id="goalsPage" class="page">
 
 <div class="page-heading">
 
@@ -538,7 +524,6 @@ Set a target and track your progress.
 
 <form id="goalForm">
 
-
 <div class="form-field">
 
 <label for="goalName">
@@ -549,7 +534,6 @@ Goal name
 id="goalName"
 type="text"
 placeholder="e.g. New Car"
-autocomplete="off"
 required
 >
 
@@ -569,9 +553,9 @@ Goal amount
 <input
 id="goalAmount"
 type="number"
-placeholder="0.00"
 min="0.01"
 step="0.01"
+placeholder="0.00"
 inputmode="decimal"
 required
 >
@@ -598,7 +582,6 @@ Save Goal
 <div class="goal-row">
 
 <div>
-
 <span class="goal-label">
 Current goal
 </span>
@@ -606,7 +589,6 @@ Current goal
 <h3 id="goalDisplayName">
 No goal set
 </h3>
-
 </div>
 
 <strong id="goalPercent">
@@ -642,12 +624,83 @@ Goal: $0.00
 
 </section>
 
+
+<!-- ================= REPORTS ================= -->
+
+<section id="reportsPage" class="page">
+
+<div class="page-heading">
+
+<h2>Reports</h2>
+
+<p>
+Create a financial report from your data.
+</p>
+
+</div>
+
+
+<div class="form-card">
+
+<div class="form-field">
+
+<label for="reportStartDate">
+Start date
+</label>
+
+<input
+id="reportStartDate"
+type="date"
+>
+
+</div>
+
+
+<div class="form-field">
+
+<label for="reportEndDate">
+End date
+</label>
+
+<input
+id="reportEndDate"
+type="date"
+>
+
+</div>
+
+
+<button
+id="generateReportButton"
+type="button"
+class="main-button"
+>
+Generate Report
+</button>
+
+</div>
+
+
+<div
+id="reportContainer"
+class="report-card"
+></div>
+
+
+<button
+id="printReportButton"
+type="button"
+class="main-button secondary-button"
+>
+Print / Save as PDF
+</button>
+
+</section>
+
 </main>
 
 
-<!-- ============================= -->
-<!-- MOBILE BOTTOM NAVIGATION -->
-<!-- ============================= -->
+<!-- ================= BOTTOM NAV ================= -->
 
 <nav class="bottom-nav">
 
@@ -684,10 +737,30 @@ data-page="transactionsPage"
 <button
 type="button"
 class="bottom-nav-button"
+data-page="paymentsPage"
+>
+<span>📅</span>
+<small>Payments</small>
+</button>
+
+
+<button
+type="button"
+class="bottom-nav-button"
 data-page="goalsPage"
 >
 <span>☆</span>
 <small>Goals</small>
+</button>
+
+
+<button
+type="button"
+class="bottom-nav-button"
+data-page="reportsPage"
+>
+<span>📊</span>
+<small>Reports</small>
 </button>
 
 </nav>

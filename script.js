@@ -2,11 +2,8 @@
 // FINANCIAL TRACKER - SUPABASE VERSION
 // ============================================================
 
-// ------------------------------------------------------------
-// SUPABASE SETTINGS
-// ------------------------------------------------------------
-
-const SUPABASE_URL = "https://stzeslietxwblleglsob.supabase.co";
+const SUPABASE_URL =
+"https://stzeslietxwblleglsob.supabase.co";
 
 const SUPABASE_KEY =
 "sb_publishable_GO4GdQMXfo61c8cS-oFr-g_Ka4-pRsC";
@@ -18,9 +15,42 @@ const GOALS_URL =
 SUPABASE_URL + "/rest/v1/savings_goals";
 
 
-// ------------------------------------------------------------
-// SUPABASE REQUEST HELPER
-// ------------------------------------------------------------
+// ============================================================
+// APP DATA
+// ============================================================
+
+let transactions = [];
+
+let savingsGoal = {
+name: "",
+amount: 0
+};
+
+
+// ============================================================
+// START AFTER HTML IS LOADED
+// ============================================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+console.log("Financial Tracker JavaScript loaded.");
+
+setupNavigation();
+setupTransactionForm();
+setupClearAllButton();
+setupGoalForm();
+
+updateApp();
+showPage("dashboard");
+
+startApp();
+
+});
+
+
+// ============================================================
+// SUPABASE REQUEST
+// ============================================================
 
 async function supabaseRequest(url, options = {}) {
 
@@ -32,19 +62,20 @@ headers: {
 
 "apikey": SUPABASE_KEY,
 
-"Authorization": "Bearer " + SUPABASE_KEY,
+"Authorization":
+"Bearer " + SUPABASE_KEY,
 
-"Content-Type": "application/json",
+"Content-Type":
+"application/json",
 
-"Prefer": options.method === "POST"
-? "return=representation"
-: options.method === "PATCH"
-? "return=representation"
-: options.method === "DELETE"
-? "return=representation"
-: "return=representation",
+"Accept":
+"application/json",
+
+"Prefer":
+"return=representation",
 
 ...(options.headers || {})
+
 }
 
 });
@@ -52,18 +83,31 @@ headers: {
 
 if (!response.ok) {
 
-const errorText = await response.text();
+const errorText =
+await response.text();
 
-console.error("Supabase error:", errorText);
+console.error(
+"Supabase error:",
+response.status,
+errorText
+);
 
-throw new Error(errorText || "Supabase request failed");
+throw new Error(
+errorText ||
+"Supabase request failed."
+);
+
 }
 
 
-const text = await response.text();
+const text =
+await response.text();
+
 
 if (!text) {
+
 return null;
+
 }
 
 
@@ -81,26 +125,64 @@ return text;
 
 
 // ============================================================
-// APP DATA
+// NAVIGATION
 // ============================================================
 
-let transactions = [];
+function setupNavigation() {
 
-let savingsGoal = {
-name: "",
-amount: 0
-};
+const buttons =
+document.querySelectorAll(".nav-btn");
 
 
-// ============================================================
-// PAGE NAVIGATION
-// ============================================================
+console.log(
+"Navigation buttons found:",
+buttons.length
+);
+
+
+buttons.forEach(function (button) {
+
+button.addEventListener(
+"click",
+function () {
+
+const page =
+button.getAttribute(
+"data-page"
+);
+
+console.log(
+"Opening page:",
+page
+);
+
+showPage(page);
+
+}
+);
+
+});
+
+}
+
 
 function showPage(pageName) {
 
-document.querySelectorAll(".page").forEach(function(page) {
+console.log(
+"showPage:",
+pageName
+);
 
-page.classList.remove("active-page");
+
+const pages =
+document.querySelectorAll(".page");
+
+
+pages.forEach(function (page) {
+
+page.classList.remove(
+"active-page"
+);
 
 });
 
@@ -111,27 +193,46 @@ document.getElementById(pageName);
 
 if (selectedPage) {
 
-selectedPage.classList.add("active-page");
+selectedPage.classList.add(
+"active-page"
+);
+
+} else {
+
+console.warn(
+"Page not found:",
+pageName
+);
 
 }
 
 
-document.querySelectorAll(".nav-btn").forEach(function(button) {
+const buttons =
+document.querySelectorAll(".nav-btn");
 
-button.classList.remove("active");
+
+buttons.forEach(function (button) {
+
+button.classList.remove(
+"active"
+);
 
 });
 
 
 const activeButton =
 document.querySelector(
-'.nav-btn[data-page="' + pageName + '"]'
+'.nav-btn[data-page="' +
+pageName +
+'"]'
 );
 
 
 if (activeButton) {
 
-activeButton.classList.add("active");
+activeButton.classList.add(
+"active"
+);
 
 }
 
@@ -144,35 +245,29 @@ behavior: "smooth"
 }
 
 
-// Make navigation buttons work
-
-document.querySelectorAll(".nav-btn").forEach(function(button) {
-
-button.addEventListener("click", function() {
-
-const page =
-button.getAttribute("data-page");
-
-showPage(page);
-
-});
-
-});
-
-
 // ============================================================
-// LOAD TRANSACTIONS FROM SUPABASE
+// LOAD TRANSACTIONS
 // ============================================================
 
 async function loadTransactions() {
 
+console.log(
+"Loading transactions..."
+);
+
+
 try {
 
-const data = await supabaseRequest(
-
+const data =
+await supabaseRequest(
 TRANSACTIONS_URL +
 "?select=*&order=id.desc"
+);
 
+
+console.log(
+"Transactions received:",
+data
 );
 
 
@@ -189,13 +284,23 @@ transactions = [];
 
 updateApp();
 
+
 } catch (error) {
 
-console.error(error);
+console.error(
+"Transaction loading error:",
+error
+);
+
+
+transactions = [];
+
+updateApp();
+
 
 alert(
 "Could not load transactions from Supabase.\n\n" +
-"Please check your Supabase table and permissions."
+error.message
 );
 
 }
@@ -204,36 +309,56 @@ alert(
 
 
 // ============================================================
-// LOAD SAVINGS GOAL FROM SUPABASE
+// LOAD SAVINGS GOAL
 // ============================================================
 
 async function loadSavingsGoal() {
 
-try {
-
-const data = await supabaseRequest(
-
-GOALS_URL +
-"?select=*&order=id.desc&limit=1"
-
+console.log(
+"Loading savings goal..."
 );
 
 
-if (Array.isArray(data) && data.length > 0) {
+try {
+
+const data =
+await supabaseRequest(
+GOALS_URL +
+"?select=*&order=id.desc&limit=1"
+);
+
+
+console.log(
+"Savings goal received:",
+data
+);
+
+
+if (
+Array.isArray(data) &&
+data.length > 0
+) {
 
 savingsGoal = {
 
-name: data[0].name || "",
+name:
+data[0].name || "",
 
-amount: Number(data[0].amount) || 0
+amount:
+Number(
+data[0].amount
+) || 0
 
 };
 
 } else {
 
 savingsGoal = {
+
 name: "",
+
 amount: 0
+
 };
 
 }
@@ -241,11 +366,13 @@ amount: 0
 
 updateGoalDisplay();
 
+
 } catch (error) {
 
-console.error(error);
-
-// Don't stop the whole application if goals fail.
+console.error(
+"Goal loading error:",
+error
+);
 
 }
 
@@ -253,60 +380,125 @@ console.error(error);
 
 
 // ============================================================
-// ADD TRANSACTION
+// TRANSACTION FORM
 // ============================================================
 
-const transactionForm =
-document.getElementById("transactionForm");
+function setupTransactionForm() {
 
-
-if (transactionForm) {
-
-transactionForm.addEventListener(
-"submit",
-async function(event) {
-
-event.preventDefault();
-
-
-const type =
+const form =
 document.getElementById(
-"transactionType"
-).value;
-
-
-const name =
-document.getElementById(
-"transactionName"
-).value.trim();
-
-
-const category =
-document.getElementById(
-"transactionCategory"
-).value;
-
-
-const amount =
-parseFloat(
-document.getElementById(
-"transactionAmount"
-).value
+"transactionForm"
 );
 
 
-if (!name) {
+console.log(
+"Transaction form:",
+form
+);
 
-alert("Please enter a description.");
+
+if (!form) {
+
+console.warn(
+"transactionForm was not found."
+);
 
 return;
 
 }
 
 
-if (!amount || amount <= 0) {
+form.addEventListener(
+"submit",
+async function (event) {
 
-alert("Please enter a valid amount.");
+event.preventDefault();
+
+
+const typeElement =
+document.getElementById(
+"transactionType"
+);
+
+
+const nameElement =
+document.getElementById(
+"transactionName"
+);
+
+
+const categoryElement =
+document.getElementById(
+"transactionCategory"
+);
+
+
+const amountElement =
+document.getElementById(
+"transactionAmount"
+);
+
+
+if (
+!typeElement ||
+!nameElement ||
+!categoryElement ||
+!amountElement
+) {
+
+alert(
+"One or more transaction form fields are missing from the HTML."
+);
+
+console.error({
+typeElement,
+nameElement,
+categoryElement,
+amountElement
+});
+
+return;
+
+}
+
+
+const type =
+typeElement.value;
+
+
+const name =
+nameElement.value.trim();
+
+
+const category =
+categoryElement.value;
+
+
+const amount =
+parseFloat(
+amountElement.value
+);
+
+
+if (!name) {
+
+alert(
+"Please enter a description."
+);
+
+return;
+
+}
+
+
+if (
+isNaN(amount) ||
+amount <= 0
+) {
+
+alert(
+"Please enter a valid amount."
+);
 
 return;
 
@@ -323,7 +515,8 @@ category: category,
 
 amount: amount,
 
-date: new Date().toLocaleDateString(
+date:
+new Date().toLocaleDateString(
 "en-US",
 {
 month: "short",
@@ -335,6 +528,12 @@ year: "numeric"
 };
 
 
+console.log(
+"Adding transaction:",
+newTransaction
+);
+
+
 try {
 
 const result =
@@ -342,16 +541,29 @@ await supabaseRequest(
 TRANSACTIONS_URL,
 {
 method: "POST",
-body: JSON.stringify(
+
+body:
+JSON.stringify(
 newTransaction
 )
 }
 );
 
 
-if (Array.isArray(result) && result.length > 0) {
+console.log(
+"Transaction added:",
+result
+);
 
-transactions.unshift(result[0]);
+
+if (
+Array.isArray(result) &&
+result.length > 0
+) {
+
+transactions.unshift(
+result[0]
+);
 
 } else {
 
@@ -360,21 +572,29 @@ await loadTransactions();
 }
 
 
-transactionForm.reset();
+form.reset();
+
 
 updateApp();
+
 
 alert(
 "Transaction added successfully!"
 );
 
 
-showPage("dashboard");
+showPage(
+"dashboard"
+);
 
 
 } catch (error) {
 
-console.error(error);
+console.error(
+"Add transaction error:",
+error
+);
+
 
 alert(
 "Could not add the transaction.\n\n" +
@@ -392,28 +612,31 @@ error.message
 // ============================================================
 // DELETE ONE TRANSACTION
 // ============================================================
-//
-// IMPORTANT:
-// This deletes ONLY the transaction whose ID is clicked.
-// It does NOT delete all transactions.
-// ============================================================
 
 async function deleteTransaction(id) {
 
-console.log("Deleting transaction ID:", id);
+console.log(
+"Deleting transaction:",
+id
+);
 
 
 const transaction =
-transactions.find(function(item) {
+transactions.find(
+function (item) {
 
-return String(item.id) === String(id);
+return String(item.id) ===
+String(id);
 
-});
+}
+);
 
 
 if (!transaction) {
 
-alert("Transaction not found.");
+alert(
+"Transaction not found."
+);
 
 return;
 
@@ -426,7 +649,9 @@ confirm(
 transaction.name +
 '" for ' +
 formatMoney(
-Number(transaction.amount)
+Number(
+transaction.amount
+)
 ) +
 "?"
 );
@@ -441,13 +666,6 @@ return;
 
 try {
 
-// IMPORTANT:
-//
-// The ?id=eq.ID part means:
-// DELETE ONLY WHERE id equals this ID.
-//
-// It does NOT delete the whole table.
-
 await supabaseRequest(
 
 TRANSACTIONS_URL +
@@ -461,25 +679,32 @@ method: "DELETE"
 );
 
 
-// Remove the same transaction from our local array.
-
 transactions =
-transactions.filter(function(item) {
+transactions.filter(
+function (item) {
 
-return String(item.id) !== String(id);
+return String(item.id) !==
+String(id);
 
-});
+}
+);
 
 
 updateApp();
 
 
-alert("Transaction deleted.");
+alert(
+"Transaction deleted."
+);
 
 
 } catch (error) {
 
-console.error(error);
+console.error(
+"Delete error:",
+error
+);
+
 
 alert(
 "Could not delete this transaction.\n\n" +
@@ -491,29 +716,44 @@ error.message
 }
 
 
-// Make the function available to your HTML onclick buttons.
+// Make available to HTML onclick
 
-window.deleteTransaction = deleteTransaction;
+window.deleteTransaction =
+deleteTransaction;
 
 
 // ============================================================
 // CLEAR ALL TRANSACTIONS
 // ============================================================
-//
-// This is the ONLY button that deletes everything.
-// ============================================================
 
-const clearAllBtn =
-document.getElementById("clearAllBtn");
+function setupClearAllButton() {
+
+const button =
+document.getElementById(
+"clearAllBtn"
+);
 
 
-if (clearAllBtn) {
+console.log(
+"Clear button:",
+button
+);
 
-clearAllBtn.addEventListener(
+
+if (!button) {
+
+return;
+
+}
+
+
+button.addEventListener(
 "click",
-async function() {
+async function () {
 
-if (transactions.length === 0) {
+if (
+transactions.length === 0
+) {
 
 alert(
 "There are no transactions to clear."
@@ -538,11 +778,6 @@ return;
 
 
 try {
-
-// Delete all rows.
-//
-// The neq filter makes the request valid
-// while matching every existing ID.
 
 await supabaseRequest(
 
@@ -569,7 +804,11 @@ alert(
 
 } catch (error) {
 
-console.error(error);
+console.error(
+"Clear all error:",
+error
+);
+
 
 alert(
 "Could not clear all transactions.\n\n" +
@@ -595,13 +834,21 @@ let income = 0;
 let expenses = 0;
 
 
-transactions.forEach(function(transaction) {
+transactions.forEach(
+function (transaction) {
 
 const amount =
-Number(transaction.amount) || 0;
+Number(
+transaction.amount
+) || 0;
 
 
-if (transaction.type === "income") {
+if (
+String(
+transaction.type
+).toLowerCase() ===
+"income"
+) {
 
 income += amount;
 
@@ -611,11 +858,8 @@ expenses += amount;
 
 }
 
-});
-
-
-const balance =
-income - expenses;
+}
+);
 
 
 return {
@@ -624,7 +868,8 @@ income: income,
 
 expenses: expenses,
 
-balance: balance
+balance:
+income - expenses
 
 };
 
@@ -642,21 +887,29 @@ calculateTotals();
 
 
 const totalIncome =
-document.getElementById("totalIncome");
+document.getElementById(
+"totalIncome"
+);
 
 
 const totalExpenses =
-document.getElementById("totalExpenses");
+document.getElementById(
+"totalExpenses"
+);
 
 
 const balance =
-document.getElementById("balance");
+document.getElementById(
+"balance"
+);
 
 
 if (totalIncome) {
 
 totalIncome.textContent =
-formatMoney(totals.income);
+formatMoney(
+totals.income
+);
 
 }
 
@@ -664,7 +917,9 @@ formatMoney(totals.income);
 if (totalExpenses) {
 
 totalExpenses.textContent =
-formatMoney(totals.expenses);
+formatMoney(
+totals.expenses
+);
 
 }
 
@@ -672,14 +927,14 @@ formatMoney(totals.expenses);
 if (balance) {
 
 balance.textContent =
-formatMoney(totals.balance);
+formatMoney(
+totals.balance
+);
 
 }
 
 
 updateRecentTransactions();
-
-updateGoalDisplay();
 
 }
 
@@ -698,12 +953,18 @@ document.getElementById(
 
 if (!container) {
 
+console.warn(
+"recentTransactions element not found."
+);
+
 return;
 
 }
 
 
-if (transactions.length === 0) {
+if (
+transactions.length === 0
+) {
 
 container.innerHTML = `
 
@@ -725,14 +986,18 @@ transactions.slice(0, 5);
 
 
 container.innerHTML =
-recent.map(function(transaction) {
+recent
+.map(
+function (transaction) {
 
 return createTransactionHTML(
 transaction,
 false
 );
 
-}).join("");
+}
+)
+.join("");
 
 }
 
@@ -751,19 +1016,33 @@ document.getElementById(
 
 if (!container) {
 
+console.warn(
+"allTransactions element not found."
+);
+
 return;
 
 }
 
 
-if (transactions.length === 0) {
+console.log(
+"Updating all transactions:",
+transactions.length
+);
+
+
+if (
+transactions.length === 0
+) {
 
 container.innerHTML = `
 
 <div class="empty">
 
 No transactions yet.
+
 <br>
+
 Add your first transaction above.
 
 </div>
@@ -776,14 +1055,18 @@ return;
 
 
 container.innerHTML =
-transactions.map(function(transaction) {
+transactions
+.map(
+function (transaction) {
 
 return createTransactionHTML(
 transaction,
 true
 );
 
-}).join("");
+}
+)
+.join("");
 
 }
 
@@ -798,33 +1081,51 @@ showDelete
 ) {
 
 const isIncome =
-transaction.type === "income";
+String(
+transaction.type
+).toLowerCase() ===
+"income";
 
 
 const icon =
-isIncome ? "📈" : "📉";
+isIncome
+? "📈"
+: "📉";
 
 
 const sign =
-isIncome ? "+" : "-";
+isIncome
+? "+"
+: "-";
 
 
-const deleteButton =
-showDelete
-? `
+let deleteButton = "";
+
+
+if (showDelete) {
+
+const safeId =
+String(
+transaction.id
+).replace(
+/'/g,
+"\\'"
+);
+
+
+deleteButton = `
 
 <button
 class="delete-btn"
-onclick="deleteTransaction('${String(
-transaction.id
-).replace(/'/g, "\\'")}')"
 type="button"
+onclick="deleteTransaction('${safeId}')"
 >
 Delete
 </button>
 
-`
-: "";
+`;
+
+}
 
 
 return `
@@ -833,9 +1134,11 @@ return `
 
 <div class="transaction-left">
 
-<div class="transaction-icon ${escapeHTML(
-transaction.type
-)}">
+<div class="transaction-icon ${
+isIncome
+? "income"
+: "expense"
+}">
 
 ${icon}
 
@@ -874,14 +1177,18 @@ transaction.date || ""
 
 <div class="transaction-right">
 
-<div class="transaction-amount ${escapeHTML(
-transaction.type
-)}">
+<div class="transaction-amount ${
+isIncome
+? "income"
+: "expense"
+}">
 
 ${sign}
 
 ${formatMoney(
-Number(transaction.amount) || 0
+Number(
+transaction.amount
+) || 0
 )}
 
 </div>
@@ -899,33 +1206,70 @@ ${deleteButton}
 
 
 // ============================================================
-// SAVINGS GOAL
+// SAVINGS GOAL FORM
 // ============================================================
 
-const goalForm =
-document.getElementById("goalForm");
+function setupGoalForm() {
+
+const form =
+document.getElementById(
+"goalForm"
+);
 
 
-if (goalForm) {
+console.log(
+"Goal form:",
+form
+);
 
-goalForm.addEventListener(
+
+if (!form) {
+
+return;
+
+}
+
+
+form.addEventListener(
 "submit",
-async function(event) {
+async function (event) {
 
 event.preventDefault();
 
 
-const name =
+const nameElement =
 document.getElementById(
 "goalName"
-).value.trim();
+);
+
+
+const amountElement =
+document.getElementById(
+"goalAmount"
+);
+
+
+if (
+!nameElement ||
+!amountElement
+) {
+
+alert(
+"Savings goal fields are missing from the HTML."
+);
+
+return;
+
+}
+
+
+const name =
+nameElement.value.trim();
 
 
 const amount =
 parseFloat(
-document.getElementById(
-"goalAmount"
-).value
+amountElement.value
 );
 
 
@@ -940,7 +1284,10 @@ return;
 }
 
 
-if (!amount || amount <= 0) {
+if (
+isNaN(amount) ||
+amount <= 0
+) {
 
 alert(
 "Please enter a valid goal amount."
@@ -953,10 +1300,7 @@ return;
 
 try {
 
-// Remove old goal first.
-//
-// This application is designed to have
-// one active savings goal.
+// Delete existing goal
 
 await supabaseRequest(
 
@@ -981,13 +1325,18 @@ amount: amount
 
 const result =
 await supabaseRequest(
+
 GOALS_URL,
+
 {
 method: "POST",
-body: JSON.stringify(
+
+body:
+JSON.stringify(
 newGoal
 )
 }
+
 );
 
 
@@ -1026,7 +1375,11 @@ alert(
 
 } catch (error) {
 
-console.error(error);
+console.error(
+"Goal save error:",
+error
+);
+
 
 alert(
 "Could not save the savings goal.\n\n" +
@@ -1061,10 +1414,15 @@ totals.balance
 let percent = 0;
 
 
-if (savingsGoal.amount > 0) {
+if (
+savingsGoal.amount > 0
+) {
 
 percent =
-(saved / savingsGoal.amount) * 100;
+(
+saved /
+savingsGoal.amount
+) * 100;
 
 }
 
@@ -1072,12 +1430,17 @@ percent =
 percent =
 Math.min(
 100,
-Math.max(0, percent)
+Math.max(
+0,
+percent
+)
 );
 
 
 const roundedPercent =
-Math.round(percent);
+Math.round(
+percent
+);
 
 
 // --------------------------------------------------------
@@ -1126,7 +1489,8 @@ savingsGoal.name ||
 if (goalPercent) {
 
 goalPercent.textContent =
-roundedPercent + "%";
+roundedPercent +
+"%";
 
 }
 
@@ -1154,7 +1518,8 @@ savingsGoal.amount
 if (goalProgressBar) {
 
 goalProgressBar.style.width =
-roundedPercent + "%";
+roundedPercent +
+"%";
 
 }
 
@@ -1205,7 +1570,8 @@ savingsGoal.name ||
 if (dashboardGoalPercent) {
 
 dashboardGoalPercent.textContent =
-roundedPercent + "%";
+roundedPercent +
+"%";
 
 }
 
@@ -1233,7 +1599,8 @@ savingsGoal.amount
 if (dashboardProgressBar) {
 
 dashboardProgressBar.style.width =
-roundedPercent + "%";
+roundedPercent +
+"%";
 
 }
 
@@ -1260,17 +1627,21 @@ Number(amount) || 0
 
 
 // ============================================================
-// SECURITY / TEXT CLEANING
+// ESCAPE HTML
 // ============================================================
 
 function escapeHTML(text) {
 
 const div =
-document.createElement("div");
+document.createElement(
+"div"
+);
 
 
 div.textContent =
-text == null ? "" : String(text);
+text == null
+? ""
+: String(text);
 
 
 return div.innerHTML;
@@ -1283,6 +1654,11 @@ return div.innerHTML;
 // ============================================================
 
 function updateApp() {
+
+console.log(
+"Updating application..."
+);
+
 
 updateDashboard();
 
@@ -1299,24 +1675,26 @@ updateGoalDisplay();
 
 async function startApp() {
 
-// Show dashboard immediately.
-
-updateApp();
-
-showPage("dashboard");
+console.log(
+"Starting Financial Tracker..."
+);
 
 
-// Then load the real data from Supabase.
+showPage(
+"dashboard"
+);
+
 
 await loadTransactions();
 
 await loadSavingsGoal();
 
+
 updateApp();
 
+
+console.log(
+"Financial Tracker ready."
+);
+
 }
-
-
-// Start
-
-startApp();

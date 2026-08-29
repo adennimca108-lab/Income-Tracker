@@ -8,6 +8,22 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
 "sb_publishable_GO4GdQMXfo61c8cS-oFr-g_Ka4-pRsC";
 
+
+// ============================================================
+// SUPABASE CLIENT
+// ============================================================
+
+const supabaseClient =
+window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+
+// ============================================================
+// REST URLS
+// ============================================================
+
 const TRANSACTIONS_URL =
 SUPABASE_URL + "/rest/v1/transactions";
 
@@ -28,42 +44,63 @@ amount: 0
 
 
 // ============================================================
-// START AFTER HTML IS LOADED
+// GET CURRENT USER
 // ============================================================
 
-document.addEventListener("DOMContentLoaded", function () {
+async function getCurrentUser() {
 
-console.log("Financial Tracker JavaScript loaded.");
+const {
+data,
+error
+} = await supabaseClient.auth.getUser();
 
-setupNavigation();
-setupTransactionForm();
-setupClearAllButton();
-setupGoalForm();
+if (error) {
 
-updateApp();
-showPage("dashboard");
+console.error(
+"Could not get current user:",
+error
+);
 
-startApp();
+return null;
+}
 
-});
+return data.user;
+}
 
 
 // ============================================================
-// SUPABASE REQUEST
+// GET AUTH HEADERS
 // ============================================================
 
-async function supabaseRequest(url, options = {}) {
+async function getAuthHeaders() {
 
-const response = await fetch(url, {
+const {
+data,
+error
+} = await supabaseClient.auth.getSession();
 
-...options,
+if (error) {
 
-headers: {
+throw error;
+}
 
-"apikey": SUPABASE_KEY,
+const session =
+data.session;
+
+if (!session) {
+
+throw new Error(
+"You are not logged in. Please log in before using the Financial Tracker."
+);
+}
+
+return {
+
+"apikey":
+SUPABASE_KEY,
 
 "Authorization":
-"Bearer " + SUPABASE_KEY,
+"Bearer " + session.access_token,
 
 "Content-Type":
 "application/json",
@@ -72,13 +109,42 @@ headers: {
 "application/json",
 
 "Prefer":
-"return=representation",
+"return=representation"
+
+};
+}
+
+
+// ============================================================
+// SUPABASE REQUEST
+// ============================================================
+
+async function supabaseRequest(
+url,
+options = {}
+) {
+
+const headers =
+await getAuthHeaders();
+
+
+const response =
+await fetch(
+url,
+{
+
+...options,
+
+headers: {
+
+...headers,
 
 ...(options.headers || {})
 
 }
 
-});
+}
+);
 
 
 if (!response.ok) {
@@ -125,13 +191,45 @@ return text;
 
 
 // ============================================================
+// START AFTER HTML IS LOADED
+// ============================================================
+
+document.addEventListener(
+"DOMContentLoaded",
+function () {
+
+console.log(
+"Financial Tracker JavaScript loaded."
+);
+
+setupNavigation();
+
+setupTransactionForm();
+
+setupClearAllButton();
+
+setupGoalForm();
+
+updateApp();
+
+showPage("dashboard");
+
+startApp();
+
+}
+);
+
+
+// ============================================================
 // NAVIGATION
 // ============================================================
 
 function setupNavigation() {
 
 const buttons =
-document.querySelectorAll(".nav-btn");
+document.querySelectorAll(
+".nav-btn"
+);
 
 
 console.log(
@@ -140,7 +238,8 @@ buttons.length
 );
 
 
-buttons.forEach(function (button) {
+buttons.forEach(
+function (button) {
 
 button.addEventListener(
 "click",
@@ -151,20 +250,27 @@ button.getAttribute(
 "data-page"
 );
 
+
 console.log(
 "Opening page:",
 page
 );
+
 
 showPage(page);
 
 }
 );
 
-});
+}
+);
 
 }
 
+
+// ============================================================
+// SHOW PAGE
+// ============================================================
 
 function showPage(pageName) {
 
@@ -175,20 +281,26 @@ pageName
 
 
 const pages =
-document.querySelectorAll(".page");
+document.querySelectorAll(
+".page"
+);
 
 
-pages.forEach(function (page) {
+pages.forEach(
+function (page) {
 
 page.classList.remove(
 "active-page"
 );
 
-});
+}
+);
 
 
 const selectedPage =
-document.getElementById(pageName);
+document.getElementById(
+pageName
+);
 
 
 if (selectedPage) {
@@ -208,16 +320,20 @@ pageName
 
 
 const buttons =
-document.querySelectorAll(".nav-btn");
+document.querySelectorAll(
+".nav-btn"
+);
 
 
-buttons.forEach(function (button) {
+buttons.forEach(
+function (button) {
 
 button.classList.remove(
 "active"
 );
 
-});
+}
+);
 
 
 const activeButton =
@@ -284,7 +400,6 @@ transactions = [];
 
 updateApp();
 
-
 } catch (error) {
 
 console.error(
@@ -298,10 +413,24 @@ transactions = [];
 updateApp();
 
 
+if (
+error.message.includes(
+"not logged in"
+)
+) {
+
+alert(
+"Please log in before loading your transactions."
+);
+
+} else {
+
 alert(
 "Could not load transactions from Supabase.\n\n" +
 error.message
 );
+
+}
 
 }
 
@@ -365,7 +494,6 @@ amount: 0
 
 
 updateGoalDisplay();
-
 
 } catch (error) {
 
@@ -451,10 +579,12 @@ alert(
 );
 
 console.error({
+
 typeElement,
 nameElement,
 categoryElement,
 amountElement
+
 });
 
 return;
@@ -505,15 +635,51 @@ return;
 }
 
 
+// ====================================================
+// GET LOGGED-IN USER
+// ====================================================
+
+const user =
+await getCurrentUser();
+
+
+if (!user) {
+
+alert(
+"You are not logged in.\n\nPlease log in before adding a transaction."
+);
+
+return;
+
+}
+
+
+console.log(
+"Current user:",
+user.id
+);
+
+
+// ====================================================
+// CREATE TRANSACTION
+// ====================================================
+
 const newTransaction = {
 
-type: type,
+user_id:
+user.id,
 
-name: name,
+type:
+type,
 
-category: category,
+name:
+name,
 
-amount: amount,
+category:
+category,
+
+amount:
+amount,
 
 date:
 new Date().toLocaleDateString(
@@ -540,12 +706,15 @@ const result =
 await supabaseRequest(
 TRANSACTIONS_URL,
 {
-method: "POST",
+
+method:
+"POST",
 
 body:
 JSON.stringify(
 newTransaction
 )
+
 }
 );
 
@@ -625,7 +794,9 @@ const transaction =
 transactions.find(
 function (item) {
 
-return String(item.id) ===
+return String(
+item.id
+) ===
 String(id);
 
 }
@@ -673,7 +844,10 @@ TRANSACTIONS_URL +
 encodeURIComponent(id),
 
 {
-method: "DELETE"
+
+method:
+"DELETE"
+
 }
 
 );
@@ -683,7 +857,9 @@ transactions =
 transactions.filter(
 function (item) {
 
-return String(item.id) !==
+return String(
+item.id
+) !==
 String(id);
 
 }
@@ -716,7 +892,9 @@ error.message
 }
 
 
-// Make available to HTML onclick
+// ============================================================
+// MAKE AVAILABLE TO HTML ONCLICK
+// ============================================================
 
 window.deleteTransaction =
 deleteTransaction;
@@ -779,13 +957,34 @@ return;
 
 try {
 
+const user =
+await getCurrentUser();
+
+
+if (!user) {
+
+alert(
+"You are not logged in."
+);
+
+return;
+
+}
+
+
 await supabaseRequest(
 
 TRANSACTIONS_URL +
-"?id=neq.0",
+"?user_id=eq." +
+encodeURIComponent(
+user.id
+),
 
 {
-method: "DELETE"
+
+method:
+"DELETE"
+
 }
 
 );
@@ -798,7 +997,7 @@ updateApp();
 
 
 alert(
-"All transactions have been deleted."
+"All your transactions have been deleted."
 );
 
 
@@ -864,9 +1063,11 @@ expenses += amount;
 
 return {
 
-income: income,
+income:
+income,
 
-expenses: expenses,
+expenses:
+expenses,
 
 balance:
 income - expenses
@@ -982,7 +1183,10 @@ return;
 
 
 const recent =
-transactions.slice(0, 5);
+transactions.slice(
+0,
+5
+);
 
 
 container.innerHTML =
@@ -1300,25 +1504,57 @@ return;
 
 try {
 
-// Delete existing goal
+const user =
+await getCurrentUser();
+
+
+if (!user) {
+
+alert(
+"You are not logged in."
+);
+
+return;
+
+}
+
+
+// ====================================================
+// DELETE ONLY THIS USER'S OLD GOALS
+// ====================================================
 
 await supabaseRequest(
 
 GOALS_URL +
-"?id=neq.0",
+"?user_id=eq." +
+encodeURIComponent(
+user.id
+),
 
 {
-method: "DELETE"
+
+method:
+"DELETE"
+
 }
 
 );
 
 
+// ====================================================
+// CREATE NEW GOAL
+// ====================================================
+
 const newGoal = {
 
-name: name,
+user_id:
+user.id,
 
-amount: amount
+name:
+name,
+
+amount:
+amount
 
 };
 
@@ -1329,12 +1565,15 @@ await supabaseRequest(
 GOALS_URL,
 
 {
-method: "POST",
+
+method:
+"POST",
 
 body:
 JSON.stringify(
 newGoal
 )
+
 }
 
 );
@@ -1498,7 +1737,9 @@ roundedPercent +
 if (goalSaved) {
 
 goalSaved.textContent =
-formatMoney(saved) +
+formatMoney(
+saved
+) +
 " saved";
 
 }
@@ -1579,7 +1820,9 @@ roundedPercent +
 if (dashboardSaved) {
 
 dashboardSaved.textContent =
-formatMoney(saved) +
+formatMoney(
+saved
+) +
 " saved";
 
 }
@@ -1616,8 +1859,13 @@ function formatMoney(amount) {
 return new Intl.NumberFormat(
 "en-US",
 {
-style: "currency",
-currency: "USD"
+
+style:
+"currency",
+
+currency:
+"USD"
+
 }
 ).format(
 Number(amount) || 0
@@ -1682,6 +1930,27 @@ console.log(
 
 showPage(
 "dashboard"
+);
+
+
+const user =
+await getCurrentUser();
+
+
+if (!user) {
+
+console.warn(
+"No authenticated Supabase user."
+);
+
+return;
+
+}
+
+
+console.log(
+"Logged in user:",
+user.id
 );
 
 
